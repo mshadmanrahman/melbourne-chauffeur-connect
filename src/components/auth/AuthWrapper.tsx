@@ -1,23 +1,22 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LoginForm from './LoginForm';
 import SignupFlow from './SignupFlow';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AuthWrapperProps {
   children: React.ReactNode;
 }
 
 const AuthWrapper = ({ children }: AuthWrapperProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { user } = useAuth();
   const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(null);
 
   const handleLogin = () => {
-    setIsAuthenticated(true);
     setAuthMode(null);
   };
 
   const handleSignupComplete = () => {
-    setIsAuthenticated(true);
     setAuthMode(null);
   };
 
@@ -26,7 +25,7 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
   };
 
   // Show auth forms if not authenticated and auth mode is set
-  if (!isAuthenticated && authMode) {
+  if (!user && authMode) {
     if (authMode === 'login') {
       return (
         <LoginForm
@@ -48,7 +47,7 @@ const AuthWrapper = ({ children }: AuthWrapperProps) => {
   }
 
   // Show main app with auth buttons if not authenticated
-  if (!isAuthenticated) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-chauffer-gray-50">
         {/* Auth buttons overlay */}

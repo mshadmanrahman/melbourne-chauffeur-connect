@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, CheckCircle, User, FileText, Shield } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SignupData {
   email: string;
@@ -30,6 +30,7 @@ interface SignupFlowProps {
 
 const SignupFlow = ({ onComplete, onCancel }: SignupFlowProps) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<SignupData>({
     email: '',
     password: '',
@@ -79,14 +80,52 @@ const SignupFlow = ({ onComplete, onCancel }: SignupFlowProps) => {
     }
   };
 
-  const handleSubmit = () => {
-    // This would integrate with Supabase when connected
-    console.log('Signup data:', formData);
-    toast({
-      title: "Account Created Successfully!",
-      description: "Welcome to ChaufferLink. Your account is pending verification.",
-    });
-    onComplete();
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            phone: formData.phone,
+            licenseNumber: formData.licenseNumber,
+            vehicleDetails: formData.vehicleDetails,
+            experience: formData.experience,
+          }
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Error creating account",
+          description: error.message,
+        });
+        return;
+      }
+
+      if (data.user) {
+        toast({
+          title: "Account Created Successfully!",
+          description: "Welcome to ChaufferLink. You can now start using the app.",
+        });
+        onComplete();
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      toast({
+        title: "Error creating account",
+        description: "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderStepContent = () => {
@@ -304,6 +343,7 @@ const SignupFlow = ({ onComplete, onCancel }: SignupFlowProps) => {
               variant="outline"
               onClick={currentStep === 1 ? onCancel : () => setCurrentStep(currentStep - 1)}
               className="flex items-center space-x-2"
+              disabled={isLoading}
             >
               <ArrowLeft size={16} />
               <span>{currentStep === 1 ? 'Cancel' : 'Back'}</span>
@@ -311,10 +351,10 @@ const SignupFlow = ({ onComplete, onCancel }: SignupFlowProps) => {
             
             <Button
               onClick={handleNext}
-              disabled={!validateStep(currentStep)}
+              disabled={!validateStep(currentStep) || isLoading}
               className="flex items-center space-x-2 bg-chauffer-mint hover:bg-chauffer-mint/90"
             >
-              <span>{currentStep === totalSteps ? 'Create Account' : 'Next'}</span>
+              <span>{currentStep === totalSteps ? (isLoading ? 'Creating...' : 'Create Account') : 'Next'}</span>
               {currentStep === totalSteps ? <CheckCircle size={16} /> : <ArrowRight size={16} />}
             </Button>
           </div>

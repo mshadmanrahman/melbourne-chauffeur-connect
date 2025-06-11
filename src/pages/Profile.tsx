@@ -1,23 +1,103 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Star, MapPin, Calendar, Award } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+
+interface UserProfile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  phone: string | null;
+  license_number: string | null;
+  vehicle_details: string | null;
+  experience: string | null;
+  created_at: string;
+}
 
 const Profile = () => {
-  // Mock user data
-  const user = {
-    name: 'Alex Thompson',
-    email: 'alex.thompson@email.com',
-    phone: '+61 4XX XXX XXX',
-    rating: 4.8,
-    totalJobs: 156,
-    joinDate: '2023-03-15',
-    location: 'Melbourne, VIC',
-    vehicleType: 'BMW 7 Series',
-    achievements: ['Top Performer', 'Reliable Driver', '100+ Rides']
+  const { user, signOut } = useAuth();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        toast({
+          title: "Error loading profile",
+          description: "Could not load your profile information.",
+        });
+        return;
+      }
+
+      setProfile(data);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of your account.",
+      });
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast({
+        title: "Error signing out",
+        description: "There was a problem signing you out.",
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-chauffer-gray-50">
+        <Header title="Profile" showNotifications={false} />
+        <div className="flex items-center justify-center h-64">
+          <div className="text-chauffer-gray-500">Loading profile...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-chauffer-gray-50">
+        <Header title="Profile" showNotifications={false} />
+        <div className="flex items-center justify-center h-64">
+          <div className="text-chauffer-gray-500">Profile not found</div>
+        </div>
+      </div>
+    );
+  }
+
+  const fullName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+  const initials = `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}`;
+  const memberSince = new Date(profile.created_at).toLocaleDateString('en-AU');
 
   return (
     <div className="min-h-screen bg-chauffer-gray-50">
@@ -31,19 +111,19 @@ const Profile = () => {
               <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-4">
                 <div className="w-16 h-16 md:w-20 md:h-20 bg-chauffer-mint rounded-full flex items-center justify-center">
                   <span className="text-white text-xl md:text-2xl font-semibold">
-                    {user.name.split(' ').map(n => n[0]).join('')}
+                    {initials}
                   </span>
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-xl md:text-2xl font-semibold text-chauffer-black">{user.name}</h2>
+                  <h2 className="text-xl md:text-2xl font-semibold text-chauffer-black">{fullName}</h2>
                   <div className="flex items-center space-x-1 mt-1">
                     <Star size={16} className="text-yellow-400 fill-current" />
-                    <span className="font-medium text-chauffer-black">{user.rating}</span>
-                    <span className="text-chauffer-gray-500">({user.totalJobs} jobs)</span>
+                    <span className="font-medium text-chauffer-black">New Driver</span>
+                    <span className="text-chauffer-gray-500">(0 jobs)</span>
                   </div>
                   <div className="flex items-center space-x-1 mt-2 text-sm text-chauffer-gray-500">
                     <MapPin size={14} />
-                    <span>{user.location}</span>
+                    <span>Australia</span>
                   </div>
                 </div>
               </div>
@@ -52,16 +132,16 @@ const Profile = () => {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 mb-6">
               <Card className="p-4 text-center">
-                <p className="text-xl md:text-2xl font-semibold text-chauffer-black">{user.totalJobs}</p>
+                <p className="text-xl md:text-2xl font-semibold text-chauffer-black">0</p>
                 <p className="text-xs text-chauffer-gray-500">Total Jobs</p>
               </Card>
               <Card className="p-4 text-center">
-                <p className="text-xl md:text-2xl font-semibold text-chauffer-mint">{user.rating}</p>
+                <p className="text-xl md:text-2xl font-semibold text-chauffer-mint">New</p>
                 <p className="text-xs text-chauffer-gray-500">Rating</p>
               </Card>
               <Card className="p-4 text-center">
-                <p className="text-xl md:text-2xl font-semibold text-chauffer-black">2.1</p>
-                <p className="text-xs text-chauffer-gray-500">Years</p>
+                <p className="text-xl md:text-2xl font-semibold text-chauffer-black">0</p>
+                <p className="text-xs text-chauffer-gray-500">Days</p>
               </Card>
             </div>
           </div>
@@ -72,17 +152,15 @@ const Profile = () => {
             <Card className="p-6">
               <div className="flex items-center space-x-2 mb-4">
                 <Award size={20} className="text-chauffer-mint" />
-                <h3 className="font-semibold text-chauffer-black">Achievements</h3>
+                <h3 className="font-semibold text-chauffer-black">Status</h3>
               </div>
               <div className="flex flex-wrap gap-2">
-                {user.achievements.map((achievement, index) => (
-                  <span 
-                    key={index}
-                    className="px-3 py-1 bg-chauffer-mint/10 text-chauffer-mint text-sm rounded-full"
-                  >
-                    {achievement}
-                  </span>
-                ))}
+                <span className="px-3 py-1 bg-chauffer-mint/10 text-chauffer-mint text-sm rounded-full">
+                  New Member
+                </span>
+                <span className="px-3 py-1 bg-chauffer-mint/10 text-chauffer-mint text-sm rounded-full">
+                  Account Verified
+                </span>
               </div>
             </Card>
           </div>
@@ -94,15 +172,15 @@ const Profile = () => {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-chauffer-gray-500">Vehicle</span>
-                  <span className="text-chauffer-black">{user.vehicleType}</span>
+                  <span className="text-chauffer-black">{profile.vehicle_details || 'Not specified'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-chauffer-gray-500">License</span>
-                  <span className="text-chauffer-black">Verified ✓</span>
+                  <span className="text-chauffer-black">{profile.license_number || 'Not verified'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-chauffer-gray-500">Insurance</span>
-                  <span className="text-chauffer-black">Active ✓</span>
+                  <span className="text-chauffer-black">Not verified</span>
                 </div>
               </div>
             </Card>
@@ -115,17 +193,15 @@ const Profile = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="flex justify-between">
                   <span className="text-chauffer-gray-500">Email</span>
-                  <span className="text-chauffer-black">{user.email}</span>
+                  <span className="text-chauffer-black">{user?.email}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-chauffer-gray-500">Phone</span>
-                  <span className="text-chauffer-black">{user.phone}</span>
+                  <span className="text-chauffer-black">{profile.phone || 'Not specified'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-chauffer-gray-500">Member Since</span>
-                  <span className="text-chauffer-black">
-                    {new Date(user.joinDate).toLocaleDateString('en-AU')}
-                  </span>
+                  <span className="text-chauffer-black">{memberSince}</span>
                 </div>
               </div>
             </Card>
@@ -143,7 +219,11 @@ const Profile = () => {
               <Button variant="outline" className="w-full">
                 Help & Support
               </Button>
-              <Button variant="outline" className="w-full text-red-600 border-red-200 hover:bg-red-50">
+              <Button 
+                variant="outline" 
+                className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                onClick={handleSignOut}
+              >
                 Sign Out
               </Button>
             </div>

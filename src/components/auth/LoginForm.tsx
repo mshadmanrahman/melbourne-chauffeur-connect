@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface LoginFormProps {
   onLogin: () => void;
@@ -30,16 +31,36 @@ const LoginForm = ({ onLogin, onSignup, onCancel }: LoginFormProps) => {
 
     setIsLoading(true);
     
-    // This would integrate with Supabase when connected
-    setTimeout(() => {
-      console.log('Login attempt:', { email });
-      toast({
-        title: "Login Successful!",
-        description: "Welcome back to ChaufferLink.",
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
       });
+
+      if (error) {
+        toast({
+          title: "Login failed",
+          description: error.message,
+        });
+        return;
+      }
+
+      if (data.user) {
+        toast({
+          title: "Login Successful!",
+          description: "Welcome back to ChaufferLink.",
+        });
+        onLogin();
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: "Login failed",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    } finally {
       setIsLoading(false);
-      onLogin();
-    }, 1000);
+    }
   };
 
   return (
