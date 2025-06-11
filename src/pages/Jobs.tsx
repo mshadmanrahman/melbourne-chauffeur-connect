@@ -6,7 +6,11 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
-const Jobs = () => {
+interface JobsProps {
+  onAuthRequired?: () => void;
+}
+
+const Jobs = ({ onAuthRequired }: JobsProps) => {
   const { user } = useAuth();
   
   // Mock data for demonstration
@@ -83,6 +87,7 @@ const Jobs = () => {
               key={job.id}
               {...job}
               onClaim={handleClaimJob}
+              onAuthRequired={onAuthRequired}
             />
           ))}
         </div>
