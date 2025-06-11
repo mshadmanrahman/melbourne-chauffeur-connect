@@ -55,7 +55,7 @@ const PostJob = () => {
     <div className="min-h-screen bg-chauffer-gray-50">
       <Header title="Post a Job" showNotifications={false} />
       
-      <div className="px-4 py-6 pb-20">
+      <div className="px-4 md:px-8 py-6 pb-20 md:pb-8 max-w-2xl md:mx-auto">
         <Card className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Route Section */}
@@ -97,7 +97,7 @@ const PostJob = () => {
                 <h3 className="font-semibold text-chauffer-black">Schedule</h3>
               </div>
               
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <Label htmlFor="date">Date *</Label>
                   <Input

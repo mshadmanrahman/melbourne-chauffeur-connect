@@ -56,7 +56,7 @@ const Jobs = () => {
     <div className="min-h-screen bg-chauffer-gray-50">
       <Header title="Available Jobs" />
       
-      <div className="px-4 py-4 pb-20">
+      <div className="px-4 md:px-8 py-4 pb-20 md:pb-8 max-w-4xl md:mx-auto">
         {/* Filters */}
         <div className="flex space-x-2 mb-4 overflow-x-auto">
           <Button variant="outline" size="sm" className="whitespace-nowrap border-chauffer-mint text-chauffer-mint">
@@ -74,7 +74,7 @@ const Jobs = () => {
         </div>
 
         {/* Job Feed */}
-        <div className="space-y-3">
+        <div className="space-y-3 md:grid md:grid-cols-2 lg:grid-cols-1 md:gap-4 md:space-y-0">
           {jobs.map(job => (
             <JobCard
               key={job.id}
@@ -85,7 +85,7 @@ const Jobs = () => {
         </div>
 
         {/* Load More */}
-        <Button variant="outline" className="w-full mt-4">
+        <Button variant="outline" className="w-full mt-4 md:max-w-xs md:mx-auto md:block">
           Load More Jobs
         </Button>
       </div>
