@@ -1,9 +1,10 @@
 
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
+import ProfileEditForm from '@/components/ProfileEditForm';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Star, MapPin, Calendar, Award } from 'lucide-react';
+import { Star, MapPin, Calendar, Award, Edit } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -23,6 +24,7 @@ const Profile = () => {
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -73,6 +75,11 @@ const Profile = () => {
     }
   };
 
+  const handleProfileUpdate = (updatedProfile: UserProfile) => {
+    setProfile(updatedProfile);
+    setIsEditing(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-chauffer-gray-50">
@@ -90,6 +97,21 @@ const Profile = () => {
         <Header title="Profile" showNotifications={false} />
         <div className="flex items-center justify-center h-64">
           <div className="text-chauffer-gray-500">Profile not found</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isEditing) {
+    return (
+      <div className="min-h-screen bg-chauffer-gray-50">
+        <Header title="Edit Profile" showNotifications={false} />
+        <div className="px-4 md:px-8 py-6 pb-20 md:pb-8">
+          <ProfileEditForm
+            profile={profile}
+            onSave={handleProfileUpdate}
+            onCancel={() => setIsEditing(false)}
+          />
         </div>
       </div>
     );
@@ -126,6 +148,15 @@ const Profile = () => {
                     <span>Australia</span>
                   </div>
                 </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center space-x-2"
+                >
+                  <Edit size={16} />
+                  <span>Edit</span>
+                </Button>
               </div>
             </Card>
 
@@ -210,7 +241,11 @@ const Profile = () => {
           {/* Actions */}
           <div className="lg:col-span-3">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setIsEditing(true)}
+              >
                 Edit Profile
               </Button>
               <Button variant="outline" className="w-full">
