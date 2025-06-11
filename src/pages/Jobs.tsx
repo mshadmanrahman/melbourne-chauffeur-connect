@@ -4,8 +4,11 @@ import Header from '@/components/Header';
 import JobCard from '@/components/JobCard';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Jobs = () => {
+  const { user } = useAuth();
+  
   // Mock data for demonstration
   const [jobs] = useState([
     {

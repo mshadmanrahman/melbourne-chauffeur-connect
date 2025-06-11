@@ -6,11 +6,17 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface AuthWrapperProps {
   children: React.ReactNode;
+  authMode?: 'login' | 'signup' | null;
+  setAuthMode?: (mode: 'login' | 'signup' | null) => void;
 }
 
-const AuthWrapper = ({ children }: AuthWrapperProps) => {
+const AuthWrapper = ({ children, authMode: externalAuthMode, setAuthMode: externalSetAuthMode }: AuthWrapperProps) => {
   const { user } = useAuth();
-  const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(null);
+  const [internalAuthMode, setInternalAuthMode] = useState<'login' | 'signup' | null>(null);
+
+  // Use external auth mode if provided, otherwise use internal
+  const authMode = externalAuthMode !== undefined ? externalAuthMode : internalAuthMode;
+  const setAuthMode = externalSetAuthMode || setInternalAuthMode;
 
   const handleLogin = () => {
     setAuthMode(null);

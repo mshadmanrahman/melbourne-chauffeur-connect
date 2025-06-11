@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { MapPin, Clock, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface JobCardProps {
   id: string;
@@ -15,6 +15,7 @@ interface JobCardProps {
   vehicleType?: string;
   status: 'available' | 'claimed' | 'completed';
   onClaim?: (jobId: string) => void;
+  onAuthRequired?: () => void;
 }
 
 const JobCard = ({ 
@@ -27,8 +28,11 @@ const JobCard = ({
   posterName, 
   vehicleType,
   status,
-  onClaim 
+  onClaim,
+  onAuthRequired
 }: JobCardProps) => {
+  const { user } = useAuth();
+
   const formatTime = (timeString: string) => {
     return new Date(timeString).toLocaleTimeString('en-AU', {
       hour: '2-digit',
@@ -43,6 +47,14 @@ const JobCard = ({
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const handleClaimClick = () => {
+    if (!user) {
+      onAuthRequired?.();
+      return;
+    }
+    onClaim?.(id);
   };
 
   return (
@@ -101,12 +113,12 @@ const JobCard = ({
         </div>
 
         {/* Action */}
-        {status === 'available' && onClaim && (
+        {status === 'available' && (
           <Button 
-            onClick={() => onClaim(id)}
+            onClick={handleClaimClick}
             className="w-full bg-chauffer-mint hover:bg-chauffer-mint/90 text-white"
           >
-            Claim Job
+            {user ? 'Claim Job' : 'Sign In to Claim Job'}
           </Button>
         )}
         

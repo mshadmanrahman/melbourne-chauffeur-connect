@@ -9,11 +9,16 @@ import AuthWrapper from '@/components/auth/AuthWrapper';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
+  const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(null);
+
+  const handleAuthRequired = () => {
+    setAuthMode('login');
+  };
 
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'home':
-        return <Jobs />;
+        return <Jobs onAuthRequired={handleAuthRequired} />;
       case 'post':
         return <PostJob />;
       case 'wallet':
@@ -21,12 +26,12 @@ const Index = () => {
       case 'profile':
         return <Profile />;
       default:
-        return <Jobs />;
+        return <Jobs onAuthRequired={handleAuthRequired} />;
     }
   };
 
   return (
-    <AuthWrapper>
+    <AuthWrapper authMode={authMode} setAuthMode={setAuthMode}>
       <div className="min-h-screen bg-chauffer-gray-50">
         {/* Desktop Layout */}
         <div className="hidden md:flex">
