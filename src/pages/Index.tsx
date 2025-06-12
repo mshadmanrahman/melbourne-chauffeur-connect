@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import Navigation from '@/components/Navigation';
+import Home from '@/pages/Home';
 import Jobs from '@/pages/Jobs';
 import PostJob from '@/pages/PostJob';
 import Wallet from '@/pages/Wallet';
@@ -18,6 +19,8 @@ const Index = () => {
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'home':
+        return <Home onAuthRequired={handleAuthRequired} />;
+      case 'jobs':
         return <Jobs onAuthRequired={handleAuthRequired} />;
       case 'post':
         return <PostJob />;
@@ -26,7 +29,7 @@ const Index = () => {
       case 'profile':
         return <Profile />;
       default:
-        return <Jobs onAuthRequired={handleAuthRequired} />;
+        return <Home onAuthRequired={handleAuthRequired} />;
     }
   };
 
@@ -45,7 +48,8 @@ const Index = () => {
             <nav className="p-4">
               <div className="space-y-2">
                 {[
-                  { id: 'home', label: 'Available Jobs', icon: '🏠' },
+                  { id: 'home', label: 'Home', icon: '🏠' },
+                  { id: 'jobs', label: 'Available Jobs', icon: '🚗' },
                   { id: 'post', label: 'Post a Job', icon: '➕' },
                   { id: 'wallet', label: 'Wallet', icon: '💰' },
                   { id: 'profile', label: 'Profile', icon: '👤' },

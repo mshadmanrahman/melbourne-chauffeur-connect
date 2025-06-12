@@ -46,6 +46,27 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
       posterName: 'David Rodriguez',
       vehicleType: 'Standard',
       status: 'claimed' as const
+    },
+    {
+      id: '4',
+      pickup: 'Melbourne Central Station',
+      dropoff: 'Crown Towers Hotel',
+      time: '2024-06-13T08:15:00',
+      payout: 55,
+      posterRating: 4.7,
+      posterName: 'Emma Thompson',
+      vehicleType: 'Luxury',
+      status: 'available' as const
+    },
+    {
+      id: '5',
+      pickup: 'Tullamarine Airport',
+      dropoff: 'South Yarra',
+      time: '2024-06-13T12:30:00',
+      payout: 75,
+      posterRating: 4.9,
+      posterName: 'James Wilson',
+      status: 'available' as const
     }
   ]);
 
@@ -78,6 +99,24 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
           <Button variant="outline" size="sm" className="whitespace-nowrap">
             Luxury
           </Button>
+        </div>
+
+        {/* Job Stats */}
+        <div className="bg-white rounded-lg p-4 mb-4 border border-chauffer-gray-200">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p className="text-2xl font-bold text-chauffer-black">{jobs.filter(j => j.status === 'available').length}</p>
+              <p className="text-sm text-chauffer-gray-500">Available</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-chauffer-mint">${jobs.reduce((sum, job) => sum + job.payout, 0)}</p>
+              <p className="text-sm text-chauffer-gray-500">Total Value</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-chauffer-black">{jobs.filter(j => j.vehicleType === 'Luxury').length}</p>
+              <p className="text-sm text-chauffer-gray-500">Luxury</p>
+            </div>
+          </div>
         </div>
 
         {/* Job Feed */}
