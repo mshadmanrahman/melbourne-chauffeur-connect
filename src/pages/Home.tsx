@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { MapPin, Clock, DollarSign, Star, Users, Shield } from 'lucide-react';
+import { MapPin, Clock, DollarSign, Star, Users, Shield, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface HomeProps {
@@ -68,15 +67,15 @@ const Home = ({ onAuthRequired }: HomeProps) => {
   return (
     <div className="min-h-screen bg-chauffer-gray-50">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-chauffer-mint to-chauffer-mint/80 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-16 md:py-24">
+      <div className="relative bg-white border-b border-chauffer-gray-200">
+        <div className="max-w-7xl mx-auto px-4 py-20 md:py-32">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-chauffer-black leading-tight">
               Melbourne's Premier
               <br />
-              <span className="text-chauffer-gray-50">Chauffeur Network</span>
+              <span className="text-chauffer-mint">Chauffeur Network</span>
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-chauffer-gray-100 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl mb-12 text-chauffer-gray-500 max-w-3xl mx-auto leading-relaxed">
               Connect professional chauffeurs with clients who need premium transportation services
             </p>
             
@@ -84,15 +83,16 @@ const Home = ({ onAuthRequired }: HomeProps) => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
-                  className="bg-white text-chauffer-mint hover:bg-chauffer-gray-50 text-lg px-8 py-4"
+                  className="bg-chauffer-mint hover:bg-chauffer-mint/90 text-white text-lg px-8 py-4 shadow-lg"
                   onClick={onAuthRequired}
                 >
                   Get Started as Driver
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="border-white text-white hover:bg-white hover:text-chauffer-mint text-lg px-8 py-4"
+                  className="border-2 border-chauffer-black text-chauffer-black hover:bg-chauffer-black hover:text-white text-lg px-8 py-4"
                   onClick={onAuthRequired}
                 >
                   Post a Job
@@ -102,14 +102,22 @@ const Home = ({ onAuthRequired }: HomeProps) => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
-                  className="bg-white text-chauffer-mint hover:bg-chauffer-gray-50 text-lg px-8 py-4"
+                  className="bg-chauffer-mint hover:bg-chauffer-mint/90 text-white text-lg px-8 py-4 shadow-lg"
                   onClick={handleViewAllJobs}
                 >
                   View Available Jobs
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>
             )}
           </div>
+        </div>
+
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-20 h-20 bg-chauffer-mint/10 rounded-full"></div>
+          <div className="absolute bottom-20 right-10 w-32 h-32 bg-chauffer-mint/5 rounded-full"></div>
+          <div className="absolute top-1/2 right-1/4 w-16 h-16 bg-chauffer-mint/10 rounded-full"></div>
         </div>
       </div>
 
@@ -268,7 +276,7 @@ const Home = ({ onAuthRequired }: HomeProps) => {
       </div>
 
       {/* CTA Section */}
-      <div className="py-16 bg-chauffer-mint">
+      <div className="py-16 bg-chauffer-black">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Start Earning?
@@ -280,18 +288,20 @@ const Home = ({ onAuthRequired }: HomeProps) => {
           {!user ? (
             <Button 
               size="lg" 
-              className="bg-white text-chauffer-mint hover:bg-chauffer-gray-50 text-lg px-8 py-4"
+              className="bg-chauffer-mint hover:bg-chauffer-mint/90 text-white text-lg px-8 py-4 shadow-lg"
               onClick={onAuthRequired}
             >
               Sign Up Now
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           ) : (
             <Button 
               size="lg" 
-              className="bg-white text-chauffer-mint hover:bg-chauffer-gray-50 text-lg px-8 py-4"
+              className="bg-chauffer-mint hover:bg-chauffer-mint/90 text-white text-lg px-8 py-4 shadow-lg"
               onClick={handleViewAllJobs}
             >
               Start Browsing Jobs
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           )}
         </div>
