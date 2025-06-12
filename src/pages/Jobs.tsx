@@ -3,7 +3,9 @@ import React, { useState } from 'react';
 import Header from '@/components/Header';
 import JobCard from '@/components/JobCard';
 import JobDetailsModal from '@/components/JobDetailsModal';
+import MyJobsSection from '@/components/MyJobsSection';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -71,7 +73,7 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
       posterName: 'James Wilson',
       status: 'available' as const
     }
-  ]);
+  ];
 
   const handleJobClick = (job: any) => {
     if (!user) {
@@ -94,60 +96,80 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
 
   return (
     <div className="min-h-screen bg-chauffer-gray-50">
-      <Header title="Available Jobs" />
+      <Header title="Jobs" />
       
       <div className="px-4 md:px-8 py-4 pb-20 md:pb-8 max-w-4xl md:mx-auto">
-        {/* Filters */}
-        <div className="flex space-x-2 mb-4 overflow-x-auto">
-          <Button variant="outline" size="sm" className="whitespace-nowrap border-chauffer-mint text-chauffer-mint">
-            All Jobs
-          </Button>
-          <Button variant="outline" size="sm" className="whitespace-nowrap">
-            Today
-          </Button>
-          <Button variant="outline" size="sm" className="whitespace-nowrap">
-            High Pay
-          </Button>
-          <Button variant="outline" size="sm" className="whitespace-nowrap">
-            Luxury
-          </Button>
-        </div>
+        <Tabs defaultValue="available" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="available">Available Jobs</TabsTrigger>
+            <TabsTrigger value="my-jobs">My Jobs</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="available" className="space-y-4">
+            {/* Filters */}
+            <div className="flex space-x-2 mb-4 overflow-x-auto">
+              <Button variant="outline" size="sm" className="whitespace-nowrap border-chauffer-mint text-chauffer-mint">
+                All Jobs
+              </Button>
+              <Button variant="outline" size="sm" className="whitespace-nowrap">
+                Today
+              </Button>
+              <Button variant="outline" size="sm" className="whitespace-nowrap">
+                High Pay
+              </Button>
+              <Button variant="outline" size="sm" className="whitespace-nowrap">
+                Luxury
+              </Button>
+            </div>
 
-        {/* Job Stats */}
-        <div className="bg-white rounded-lg p-4 mb-4 border border-chauffer-gray-200">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <p className="text-2xl font-bold text-chauffer-black">{jobs.filter(j => j.status === 'available').length}</p>
-              <p className="text-sm text-chauffer-gray-500">Available</p>
+            {/* Job Stats */}
+            <div className="bg-white rounded-lg p-4 mb-4 border border-chauffer-gray-200">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-bold text-chauffer-black">{jobs.filter(j => j.status === 'available').length}</p>
+                  <p className="text-sm text-chauffer-gray-500">Available</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-chauffer-mint">${jobs.reduce((sum, job) => sum + job.payout, 0)}</p>
+                  <p className="text-sm text-chauffer-gray-500">Total Value</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-chauffer-black">{jobs.filter(j => j.vehicleType === 'Luxury').length}</p>
+                  <p className="text-sm text-chauffer-gray-500">Luxury</p>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-chauffer-mint">${jobs.reduce((sum, job) => sum + job.payout, 0)}</p>
-              <p className="text-sm text-chauffer-gray-500">Total Value</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-chauffer-black">{jobs.filter(j => j.vehicleType === 'Luxury').length}</p>
-              <p className="text-sm text-chauffer-gray-500">Luxury</p>
-            </div>
-          </div>
-        </div>
 
-        {/* Job Feed */}
-        <div className="space-y-3 md:grid md:grid-cols-2 lg:grid-cols-1 md:gap-4 md:space-y-0">
-          {jobs.map(job => (
-            <div key={job.id} onClick={() => handleJobClick(job)} className="cursor-pointer">
-              <JobCard
-                {...job}
-                onClaim={handleClaimJob}
-                onAuthRequired={onAuthRequired}
-              />
+            {/* Job Feed */}
+            <div className="space-y-3 md:grid md:grid-cols-2 lg:grid-cols-1 md:gap-4 md:space-y-0">
+              {jobs.map(job => (
+                <div key={job.id} onClick={() => handleJobClick(job)} className="cursor-pointer">
+                  <JobCard
+                    {...job}
+                    onClaim={handleClaimJob}
+                    onAuthRequired={onAuthRequired}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Load More */}
-        <Button variant="outline" className="w-full mt-4 md:max-w-xs md:mx-auto md:block">
-          Load More Jobs
-        </Button>
+            {/* Load More */}
+            <Button variant="outline" className="w-full mt-4 md:max-w-xs md:mx-auto md:block">
+              Load More Jobs
+            </Button>
+          </TabsContent>
+          
+          <TabsContent value="my-jobs">
+            {user ? (
+              <MyJobsSection />
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-chauffer-gray-500 mb-4">Please log in to view your jobs</p>
+                <Button onClick={onAuthRequired}>Log In</Button>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Job Details Modal */}

@@ -50,7 +50,7 @@ const Index = () => {
               <div className="space-y-2">
                 {[
                   { id: 'home', label: 'Home', icon: HomeIcon },
-                  { id: 'jobs', label: 'Available Jobs', icon: Briefcase },
+                  { id: 'jobs', label: 'Jobs', icon: Briefcase },
                   { id: 'post', label: 'Post a Job', icon: Plus },
                   { id: 'wallet', label: 'Wallet', icon: WalletIcon },
                   { id: 'profile', label: 'Profile', icon: User },

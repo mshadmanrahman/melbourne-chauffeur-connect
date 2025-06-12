@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Home, Plus, User, Wallet } from 'lucide-react';
+import { Home, Plus, User, Wallet, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface NavigationProps {
@@ -10,7 +10,8 @@ interface NavigationProps {
 
 const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const navItems = [
-    { id: 'home', label: 'Jobs', icon: Home },
+    { id: 'home', label: 'Home', icon: Home },
+    { id: 'jobs', label: 'Jobs', icon: Briefcase },
     { id: 'post', label: 'Post', icon: Plus },
     { id: 'wallet', label: 'Wallet', icon: Wallet },
     { id: 'profile', label: 'Profile', icon: User },
