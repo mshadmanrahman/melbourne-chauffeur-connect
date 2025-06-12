@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,10 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
-import { MapPin, Clock, DollarSign } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { MapPin, Clock, DollarSign, CreditCard, AlertCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const PostJob = () => {
+  const { user } = useAuth();
+  const [hasStripeSetup, setHasStripeSetup] = useState(false);
   const [formData, setFormData] = useState({
     pickup: '',
     dropoff: '',
@@ -21,8 +25,40 @@ const PostJob = () => {
     notes: ''
   });
 
+  useEffect(() => {
+    // Check if user has Stripe payment setup
+    // This would normally check against a database or Stripe API
+    setHasStripeSetup(false);
+  }, [user]);
+
+  const handleStripeSetup = () => {
+    // This would redirect to Stripe Connect or payment setup
+    toast({
+      title: "Stripe Setup",
+      description: "Redirecting to payment setup...",
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "You must be logged in to post a job.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!hasStripeSetup) {
+      toast({
+        title: "Payment Setup Required",
+        description: "You must set up payment details before posting a job.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     // Basic validation
     if (!formData.pickup || !formData.dropoff || !formData.date || !formData.time || !formData.payout) {
@@ -51,11 +87,48 @@ const PostJob = () => {
     });
   };
 
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-chauffer-gray-50">
+        <Header title="Post a Job" showNotifications={false} />
+        
+        <div className="px-4 md:px-8 py-6 pb-20 md:pb-8 max-w-2xl md:mx-auto">
+          <Card className="p-8 text-center">
+            <AlertCircle size={48} className="text-chauffer-gray-400 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-chauffer-black mb-2">Login Required</h2>
+            <p className="text-chauffer-gray-500 mb-4">
+              You must be logged in to post a job. Please log in or create an account to continue.
+            </p>
+            <Button className="bg-chauffer-mint hover:bg-chauffer-mint/90">
+              Login to Continue
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-chauffer-gray-50">
       <Header title="Post a Job" showNotifications={false} />
       
       <div className="px-4 md:px-8 py-6 pb-20 md:pb-8 max-w-2xl md:mx-auto">
+        {!hasStripeSetup && (
+          <Alert className="mb-6 border-orange-200 bg-orange-50">
+            <CreditCard className="h-4 w-4 text-orange-600" />
+            <AlertDescription className="text-orange-800">
+              You need to set up payment details before posting jobs. 
+              <Button 
+                variant="link" 
+                className="text-orange-600 p-0 ml-1 h-auto"
+                onClick={handleStripeSetup}
+              >
+                Set up payments now
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Card className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Route Section */}
@@ -181,8 +254,9 @@ const PostJob = () => {
             <Button 
               type="submit" 
               className="w-full bg-chauffer-mint hover:bg-chauffer-mint/90 text-white h-12"
+              disabled={!hasStripeSetup}
             >
-              Post Job
+              {!hasStripeSetup ? 'Set Up Payments First' : 'Post Job'}
             </Button>
           </form>
         </Card>

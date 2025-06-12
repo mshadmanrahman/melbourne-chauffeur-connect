@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import JobCard from '@/components/JobCard';
+import JobDetailsModal from '@/components/JobDetailsModal';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,6 +13,8 @@ interface JobsProps {
 
 const Jobs = ({ onAuthRequired }: JobsProps) => {
   const { user } = useAuth();
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   
   // Mock data for demonstration
   const [jobs] = useState([
@@ -70,6 +73,15 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
     }
   ]);
 
+  const handleJobClick = (job: any) => {
+    if (!user) {
+      onAuthRequired?.();
+      return;
+    }
+    setSelectedJob(job);
+    setIsDetailsModalOpen(true);
+  };
+
   const handleClaimJob = (jobId: string) => {
     const job = jobs.find(j => j.id === jobId);
     if (job) {
@@ -122,12 +134,13 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
         {/* Job Feed */}
         <div className="space-y-3 md:grid md:grid-cols-2 lg:grid-cols-1 md:gap-4 md:space-y-0">
           {jobs.map(job => (
-            <JobCard
-              key={job.id}
-              {...job}
-              onClaim={handleClaimJob}
-              onAuthRequired={onAuthRequired}
-            />
+            <div key={job.id} onClick={() => handleJobClick(job)} className="cursor-pointer">
+              <JobCard
+                {...job}
+                onClaim={handleClaimJob}
+                onAuthRequired={onAuthRequired}
+              />
+            </div>
           ))}
         </div>
 
@@ -136,6 +149,14 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
           Load More Jobs
         </Button>
       </div>
+
+      {/* Job Details Modal */}
+      <JobDetailsModal
+        job={selectedJob}
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+        onClaim={handleClaimJob}
+      />
     </div>
   );
 };
