@@ -73,7 +73,7 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
       posterName: 'James Wilson',
       status: 'available' as const
     }
-  ];
+  ]);
 
   const handleJobClick = (job: any) => {
     if (!user) {
