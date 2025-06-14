@@ -21,6 +21,7 @@ const ProfileProgress = ({ profile, hasStripeConnected: _ }: ProfileProgressProp
     console.log('ProfileProgress - stripeAccount:', stripeAccount);
     console.log('ProfileProgress - loading:', loading);
     console.log('ProfileProgress - onboarding_complete:', stripeAccount?.onboarding_complete);
+    console.log('ProfileProgress - onboarding_complete type:', typeof stripeAccount?.onboarding_complete);
   }, [stripeAccount, loading]);
 
   // Auto-refresh when component mounts to check latest status
@@ -30,6 +31,9 @@ const ProfileProgress = ({ profile, hasStripeConnected: _ }: ProfileProgressProp
       refetch();
     }
   }, [user?.id, refetch]);
+
+  // Check if Stripe onboarding is complete (handle both boolean and string values)
+  const isStripeComplete = stripeAccount?.onboarding_complete === true || stripeAccount?.onboarding_complete === 'true';
 
   const checklistItems = [
     {
@@ -59,7 +63,7 @@ const ProfileProgress = ({ profile, hasStripeConnected: _ }: ProfileProgressProp
     {
       id: 'stripe',
       label: 'Payment Setup',
-      completed: !!stripeAccount?.onboarding_complete,
+      completed: isStripeComplete,
       description: 'Stripe payment integration'
     }
   ];
@@ -103,11 +107,13 @@ const ProfileProgress = ({ profile, hasStripeConnected: _ }: ProfileProgressProp
       <div className="mb-4 p-2 bg-gray-100 rounded text-xs">
         <p>Debug: Stripe Account ID: {stripeAccount?.stripe_account_id || 'None'}</p>
         <p>Debug: Onboarding Complete: {stripeAccount?.onboarding_complete ? 'Yes' : 'No'}</p>
+        <p>Debug: Onboarding Complete (raw): {JSON.stringify(stripeAccount?.onboarding_complete)}</p>
         <p>Debug: Loading: {loading ? 'Yes' : 'No'}</p>
+        <p>Debug: Is Stripe Complete Check: {isStripeComplete ? 'Yes' : 'No'}</p>
       </div>
       
       <StripeConnectButton
-        onboardingComplete={!!stripeAccount?.onboarding_complete}
+        onboardingComplete={isStripeComplete}
         onOnboarded={refetch}
       />
     </Card>
