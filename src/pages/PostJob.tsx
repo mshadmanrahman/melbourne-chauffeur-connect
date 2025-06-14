@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -8,14 +7,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { MapPin, Clock, DollarSign, CreditCard, AlertCircle } from 'lucide-react';
+import { MapPin, Clock, DollarSign, CreditCard, AlertCircle, Loader2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useStripeAccount } from '@/hooks/useStripeAccount';
 
 const PostJob = () => {
   const { user } = useAuth();
-  const [hasStripeSetup, setHasStripeSetup] = useState(false);
+  const { stripeAccount, loading: stripeLoading, refetch } = useStripeAccount(user?.id);
+  const [stripeBtnLoading, setStripeBtnLoading] = useState(false);
+
+  // hasStripeSetup is true when onboarding_complete
+  const hasStripeSetup = !!stripeAccount?.onboarding_complete;
+
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     pickup: '',
@@ -33,12 +38,41 @@ const PostJob = () => {
     setHasStripeSetup(false);
   }, [user]);
 
-  const handleStripeSetup = () => {
-    // This would redirect to Stripe Connect or payment setup
-    toast({
-      title: "Stripe Setup",
-      description: "Redirecting to payment setup...",
-    });
+  const handleStripeSetup = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "You must be logged in to set up payments.",
+        variant: "destructive"
+      });
+      return;
+    }
+    setStripeBtnLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-onboard");
+      if (error || !data) {
+        toast({
+          title: "Stripe error",
+          description: error?.message || "Failed to connect to Stripe.",
+          variant: "destructive"
+        });
+        return;
+      }
+      if (data.onboarding_url) {
+        window.open(data.onboarding_url, "_blank");
+        setTimeout(refetch, 6000); // Poll for completion after a delay
+      } else {
+        toast({
+          title: "Stripe error",
+          description: "Could not generate onboarding link.",
+          variant: "destructive"
+        });
+      }
+    } catch (err) {
+      toast({ title: "Stripe Error", description: String(err), variant: "destructive" });
+    } finally {
+      setStripeBtnLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -149,14 +183,21 @@ const PostJob = () => {
         {!hasStripeSetup && (
           <Alert className="mb-6 border-orange-200 bg-orange-50">
             <CreditCard className="h-4 w-4 text-orange-600" />
-            <AlertDescription className="text-orange-800">
+            <AlertDescription className="text-orange-800 flex items-center flex-wrap gap-1">
               You need to set up payment details before posting jobs.
               <Button
                 variant="link"
-                className="text-orange-600 p-0 ml-1 h-auto"
+                className="text-orange-600 p-0 ml-1 h-auto flex items-center"
                 onClick={handleStripeSetup}
+                disabled={stripeBtnLoading || stripeLoading}
               >
-                Set up payments now
+                {stripeBtnLoading ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2" size={16} /> Setting up ...
+                  </>
+                ) : (
+                  <>Set up payments now</>
+                )}
               </Button>
             </AlertDescription>
           </Alert>
