@@ -4,9 +4,12 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowUp, ArrowDown, Plus } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Wallet = () => {
-  // Mock data
+  const { user } = useAuth();
+
+  // Mock data (only used when authenticated)
   const balance = 247.50;
   const transactions = [
     {
@@ -54,6 +57,49 @@ const Wallet = () => {
     }
   };
 
+  // If not logged in, show friendly notice with login/sign up
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-chauffer-gray-50 flex flex-col items-center justify-center px-4">
+        <Header title="Wallet" />
+        <div className="w-full max-w-md mt-12 flex flex-col items-center">
+          <Card className="p-8 text-center">
+            <h2 className="text-2xl font-bold mb-2 text-chauffer-black">Sign in to view your wallet</h2>
+            <p className="text-chauffer-gray-600 mb-6">
+              Your wallet, balance, and transaction history are only visible to registered users.
+            </p>
+            <div className="flex flex-col gap-3 w-full">
+              <Button
+                className="w-full bg-chauffer-mint hover:bg-chauffer-mint/90 text-white"
+                onClick={() => {
+                  // Find the global authMode setter and trigger login modal
+                  if (window && typeof window !== 'undefined') {
+                    // Use a custom event to tell AuthWrapper to open login
+                    window.dispatchEvent(new CustomEvent('lovable-set-auth-mode', { detail: 'login' }))
+                  }
+                }}
+              >
+                Log In
+              </Button>
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={() => {
+                  if (window && typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('lovable-set-auth-mode', { detail: 'signup' }))
+                  }
+                }}
+              >
+                Sign Up
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Authenticated state: show full wallet
   return (
     <div className="min-h-screen bg-chauffer-gray-50">
       <Header title="Wallet" />
@@ -68,13 +114,13 @@ const Wallet = () => {
                 <p className="text-3xl md:text-4xl font-bold mb-4">${balance.toFixed(2)}</p>
                 
                 <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
-                  <Button variant="secondary" className="flex-1">
+                  <Button variant="secondary" className="flex-1 min-w-0">
                     <Plus size={16} className="mr-2" />
-                    Top Up
+                    <span className="whitespace-nowrap">Top Up</span>
                   </Button>
-                  <Button variant="outline" className="flex-1 border-white/20 text-white hover:bg-white/10">
+                  <Button variant="outline" className="flex-1 min-w-0 border-white/20 text-white hover:bg-white/10">
                     <ArrowUp size={16} className="mr-2" />
-                    Withdraw
+                    <span className="whitespace-nowrap">Withdraw</span>
                   </Button>
                 </div>
               </div>
