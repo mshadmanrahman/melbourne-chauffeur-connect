@@ -4,6 +4,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
+// Type definition matches the jobs table
+type Job = {
+  id: string;
+  poster_id: string;
+  pickup: string;
+  dropoff: string;
+  time: string;
+  payout: number;
+  vehicle_type: string | null;
+  notes: string | null;
+  status: string;
+  claimed_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export function useJobNotifications() {
   const { user } = useAuth();
   const [hasUnread, setHasUnread] = useState(false);
@@ -23,9 +39,9 @@ export function useJobNotifications() {
           table: "jobs",
         },
         (payload) => {
-          const job = payload.new;
-          // Only notify if relevant: jobs posted/claimed by user (and skip repeated events)
+          const job = payload.new as Job | undefined;
           if (
+            job &&
             (job.poster_id === user.id || job.claimed_by === user.id) &&
             !handledJobIds.current.has(job.id)
           ) {
