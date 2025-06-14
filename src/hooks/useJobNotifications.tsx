@@ -46,8 +46,10 @@ export function useJobNotifications() {
   useEffect(() => {
     if (!user) return;
 
+    // Use a unique channel name per user to avoid duplicate subscriptions
+    const channelName = `realtime:public:jobs:notifications:${user.id}`;
     const channel = supabase
-      .channel("realtime:public:jobs:notifications")
+      .channel(channelName)
       .on(
         "postgres_changes",
         {
@@ -99,8 +101,9 @@ export function useJobNotifications() {
             }
           }
         }
-      )
-      .subscribe();
+      );
+
+    channel.subscribe();
 
     return () => {
       supabase.removeChannel(channel);
@@ -112,4 +115,3 @@ export function useJobNotifications() {
 
   return { hasUnread, markAsRead };
 }
-

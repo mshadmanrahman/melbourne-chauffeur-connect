@@ -135,8 +135,10 @@ export const useMyJobs = () => {
   useEffect(() => {
     if (!user) return;
 
+    // Use a unique channel name per user to avoid double subscribe issues
+    const channelName = `realtime:public:jobs:${user.id}`;
     const channel = supabase
-      .channel("realtime:public:jobs")
+      .channel(channelName)
       .on(
         "postgres_changes",
         {
@@ -148,8 +150,10 @@ export const useMyJobs = () => {
           queryClient.invalidateQueries({ queryKey: ["my-claimed-jobs"] });
           queryClient.invalidateQueries({ queryKey: ["my-posted-jobs"] });
         }
-      )
-      .subscribe();
+      );
+
+    // Subscribe & track the returned promise for handling errors (if desired)
+    channel.subscribe();
 
     return () => {
       supabase.removeChannel(channel);
