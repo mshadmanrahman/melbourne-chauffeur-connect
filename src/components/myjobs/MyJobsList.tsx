@@ -8,10 +8,11 @@ interface MyJobsListProps {
   onStart: (id: string) => void;
   onComplete: (id: string) => void;
   onCancel: (id: string) => void;
+  loadingAction?: boolean;
 }
 
 const MyJobsList: React.FC<MyJobsListProps> = ({
-  jobs, onStart, onComplete, onCancel
+  jobs, onStart, onComplete, onCancel, loadingAction = false
 }) => {
   if (jobs.length === 0) {
     return (
@@ -30,6 +31,7 @@ const MyJobsList: React.FC<MyJobsListProps> = ({
           onStart={onStart}
           onComplete={onComplete}
           onCancel={onCancel}
+          loadingAction={loadingAction}
         />
       ))}
     </div>
@@ -37,4 +39,3 @@ const MyJobsList: React.FC<MyJobsListProps> = ({
 };
 
 export default MyJobsList;
-

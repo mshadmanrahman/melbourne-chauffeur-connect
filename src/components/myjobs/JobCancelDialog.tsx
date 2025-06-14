@@ -11,10 +11,11 @@ interface JobCancelDialogProps {
   reason: string;
   onReasonChange: (s: string) => void;
   onCancelJob: () => void;
+  loading?: boolean;
 }
 
 const JobCancelDialog: React.FC<JobCancelDialogProps> = ({
-  open, onOpenChange, reason, onReasonChange, onCancelJob,
+  open, onOpenChange, reason, onReasonChange, onCancelJob, loading = false,
 }) => (
   <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent>
@@ -31,6 +32,7 @@ const JobCancelDialog: React.FC<JobCancelDialogProps> = ({
             onChange={(e) => onReasonChange(e.target.value)}
             className="mt-1"
             rows={3}
+            disabled={loading}
           />
         </div>
         <div className="flex space-x-3">
@@ -38,13 +40,15 @@ const JobCancelDialog: React.FC<JobCancelDialogProps> = ({
             onClick={onCancelJob}
             variant="destructive"
             className="flex-1"
+            disabled={loading}
           >
-            Cancel Job
+            {loading ? "Cancelling..." : "Cancel Job"}
           </Button>
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
             className="flex-1"
+            disabled={loading}
           >
             Keep Job
           </Button>

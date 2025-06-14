@@ -29,9 +29,12 @@ interface MyJobCardProps {
   onStart: (id: string) => void;
   onComplete: (id: string) => void;
   onCancel: (id: string) => void;
+  loadingAction?: boolean;
 }
 
-const MyJobCard: React.FC<MyJobCardProps> = ({ job, onStart, onComplete, onCancel }) => (
+const MyJobCard: React.FC<MyJobCardProps> = ({
+  job, onStart, onComplete, onCancel, loadingAction = false
+}) => (
   <Card key={job.id} className="p-4">
     <div className="flex flex-col md:flex-row md:items-center justify-between space-y-3 md:space-y-0">
       <div className="flex-1">
@@ -71,18 +74,20 @@ const MyJobCard: React.FC<MyJobCardProps> = ({ job, onStart, onComplete, onCance
               size="sm"
               onClick={() => onStart(job.id)}
               className="bg-chauffer-mint hover:bg-chauffer-mint/90"
+              disabled={loadingAction}
             >
               <Play size={14} className="mr-1" />
-              Start
+              {loadingAction ? "Starting..." : "Start"}
             </Button>
             <Button
               size="sm"
               variant="outline"
               onClick={() => onCancel(job.id)}
               className="text-red-600 border-red-200 hover:bg-red-50"
+              disabled={loadingAction}
             >
               <X size={14} className="mr-1" />
-              Cancel
+              {loadingAction ? "Cancelling..." : "Cancel"}
             </Button>
           </>
         )}
@@ -91,9 +96,10 @@ const MyJobCard: React.FC<MyJobCardProps> = ({ job, onStart, onComplete, onCance
             size="sm"
             onClick={() => onComplete(job.id)}
             className="bg-green-600 hover:bg-green-700"
+            disabled={loadingAction}
           >
             <CheckCircle size={14} className="mr-1" />
-            Complete
+            {loadingAction ? "Completing..." : "Complete"}
           </Button>
         )}
       </div>
@@ -102,4 +108,3 @@ const MyJobCard: React.FC<MyJobCardProps> = ({ job, onStart, onComplete, onCance
 );
 
 export default MyJobCard;
-
