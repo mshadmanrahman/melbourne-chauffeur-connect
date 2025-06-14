@@ -33,7 +33,7 @@ const ProfileProgress = ({ profile, hasStripeConnected: _ }: ProfileProgressProp
   }, [user?.id, refetch]);
 
   // Check if Stripe onboarding is complete (handle both boolean and string values)
-  const isStripeComplete = stripeAccount?.onboarding_complete === true || stripeAccount?.onboarding_complete === 'true';
+  const isStripeComplete = stripeAccount?.onboarding_complete === true || stripeAccount?.onboarding_complete === "true";
 
   const checklistItems = [
     {
