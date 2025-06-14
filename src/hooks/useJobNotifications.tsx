@@ -107,17 +107,11 @@ export function useJobNotifications() {
         }
       );
 
-    // Only subscribe once per channel instance and AFTER setting handlers
-    // Also guard against useEffect re-entry
     (async () => {
       try {
-        const { error } = await channel.subscribe();
-        if (error) {
-          console.error("Supabase channel subscribe error", error);
-        } else {
-          if (isMounted) {
-            channelRef.current = channel;
-          }
+        await channel.subscribe();
+        if (isMounted) {
+          channelRef.current = channel;
         }
       } catch (e) {
         console.error("Supabase channel subscribe exception", e);
