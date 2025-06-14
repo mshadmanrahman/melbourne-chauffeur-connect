@@ -1,14 +1,16 @@
 
 import React from 'react';
-import { Home, Plus, User, Wallet, Briefcase } from 'lucide-react';
+import { Home, Plus, User, Wallet, Briefcase, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface NavigationProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  showLogout?: boolean;
+  onLogout?: () => void;
 }
 
-const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
+const Navigation = ({ activeTab, onTabChange, showLogout, onLogout }: NavigationProps) => {
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'jobs', label: 'Jobs', icon: Briefcase },
@@ -41,6 +43,19 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
             </Button>
           );
         })}
+        {/* Logout button on mobile */}
+        {showLogout && onLogout && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onLogout}
+            aria-label="Logout"
+            className="flex flex-col items-center justify-center p-2 h-auto min-w-[60px] text-red-500"
+          >
+            <LogOut size={20} className="mb-1" />
+            <span className="text-xs font-medium">Logout</span>
+          </Button>
+        )}
       </div>
     </nav>
   );

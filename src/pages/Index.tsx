@@ -7,10 +7,16 @@ import Wallet from '@/pages/Wallet';
 import Profile from '@/pages/Profile';
 import AuthWrapper from '@/components/auth/AuthWrapper';
 import { Home as HomeIcon, Briefcase, Plus, Wallet as WalletIcon, User } from 'lucide-react';
+import { logOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(null);
+
+  // Add auth context
+  const { user, signOut } = useAuth();
 
   const handleAuthRequired = () => {
     setAuthMode('login');
@@ -19,6 +25,24 @@ const Index = () => {
   // New: handler to be passed down so child components can change tab
   const handleSetTab = (tab: string) => {
     setActiveTab(tab);
+  };
+
+  // Handle logout logic
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out.",
+      });
+      setActiveTab('home');
+    } catch {
+      toast({
+        title: "Logout failed",
+        description: "There was a problem signing out.",
+        variant: "destructive"
+      });
+    }
   };
 
   const renderActiveTab = () => {
@@ -44,13 +68,13 @@ const Index = () => {
         {/* Desktop Layout */}
         <div className="hidden md:flex">
           {/* Sidebar */}
-          <div className="w-64 bg-white border-r border-chauffer-gray-200 min-h-screen fixed left-0 top-0 z-40">
+          <div className="w-64 bg-white border-r border-chauffer-gray-200 min-h-screen fixed left-0 top-0 z-40 flex flex-col">
             <div className="p-6 border-b border-chauffer-gray-200">
               <h1 className="text-2xl font-bold text-chauffer-black">ChaufferLink</h1>
               <p className="text-sm text-chauffer-gray-500 mt-1">Melbourne's Premier Network</p>
             </div>
             
-            <nav className="p-4">
+            <nav className="p-4 flex-1">
               <div className="space-y-2">
                 {[
                   { id: 'home', label: 'Home', icon: HomeIcon },
@@ -76,6 +100,17 @@ const Index = () => {
                   );
                 })}
               </div>
+              {/* Spacer to push logout button to bottom */}
+              <div className="flex-1" />
+              {user && (
+                <button
+                  onClick={handleSignOut}
+                  className="mt-8 w-full flex items-center space-x-3 px-4 py-3 rounded-md text-left transition-colors text-red-600 hover:bg-red-50 border border-red-100"
+                >
+                  <logOut size={18} className="stroke-red-600" />
+                  <span className="font-medium">Logout</span>
+                </button>
+              )}
             </nav>
           </div>
 
@@ -114,7 +149,12 @@ const Index = () => {
             </div>
           </footer>
           
-          <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+          <Navigation
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            showLogout={!!user}
+            onLogout={handleSignOut}
+          />
         </div>
       </div>
     </AuthWrapper>
