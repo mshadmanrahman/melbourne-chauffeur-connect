@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -134,6 +133,35 @@ const MyJobsTabs = () => {
       });
     },
   });
+
+  // NEW: Realtime subscription to jobs table changes
+  useEffect(() => {
+    // Only subscribe if user is logged in
+    if (!user) return;
+
+    const channel = supabase
+      .channel("realtime:public:jobs")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "jobs",
+        },
+        (payload) => {
+          // Refetch after any job insert/update/delete
+          queryClient.invalidateQueries({ queryKey: ["my-claimed-jobs"] });
+          queryClient.invalidateQueries({ queryKey: ["my-posted-jobs"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+    // We want to subscribe whenever user id changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, queryClient]);
 
   // Handler functions
   const handleStartJob = (jobId: string) => startJobMutation.mutate(jobId);
