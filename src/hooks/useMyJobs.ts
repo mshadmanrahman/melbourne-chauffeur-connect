@@ -14,6 +14,7 @@ export const useMyJobs = () => {
   const [cancelReason, setCancelReason] = useState("");
   const [tab, setTab] = useState<"posted" | "claimed">("claimed");
   const channelRef = useRef<any>(null);
+  const isSubscribedRef = useRef(false);
 
   const posted = usePostedJobs();
   const claimed = useClaimedJobs();
@@ -29,14 +30,26 @@ export const useMyJobs = () => {
 
   // Realtime updates
   useEffect(() => {
-    let isMounted = true;
+    if (!user) {
+      // Clean up when user logs out
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+        isSubscribedRef.current = false;
+      }
+      return;
+    }
 
-    if (!user) return;
+    // Don't create a new channel if we already have one subscribed
+    if (isSubscribedRef.current && channelRef.current) {
+      return;
+    }
 
-    // Clean up any prior channel before creating a new one
+    // Clean up any existing channel before creating a new one
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
+      isSubscribedRef.current = false;
     }
 
     const channelName = `realtime:public:jobs:${user.id}`;
@@ -55,26 +68,28 @@ export const useMyJobs = () => {
         }
       );
 
-    (async () => {
+    const subscribeToChannel = async () => {
       try {
         await channel.subscribe();
-        if (isMounted) {
-          channelRef.current = channel;
-        }
+        channelRef.current = channel;
+        isSubscribedRef.current = true;
+        console.log("Successfully subscribed to jobs realtime channel");
       } catch (e) {
         console.error("Supabase channel subscribe exception", e);
+        isSubscribedRef.current = false;
       }
-    })();
+    };
+
+    subscribeToChannel();
 
     return () => {
-      isMounted = false;
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
+        isSubscribedRef.current = false;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, posted, claimed]);
+  }, [user?.id, posted.refetch, claimed.refetch]);
 
   // Handler functions
   const handleStartJob = (jobId: string) => startJobMutation.mutate(jobId);

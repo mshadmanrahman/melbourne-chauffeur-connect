@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -42,16 +43,29 @@ export function useJobNotifications() {
   const handledJobIds = useRef<Set<string>>(new Set());
   const { toast } = useToast();
   const channelRef = useRef<any>(null);
+  const isSubscribedRef = useRef(false);
 
   useEffect(() => {
-    let isMounted = true;
+    if (!user) {
+      // Clean up when user logs out
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+        isSubscribedRef.current = false;
+      }
+      return;
+    }
 
-    if (!user) return;
+    // Don't create a new channel if we already have one subscribed
+    if (isSubscribedRef.current && channelRef.current) {
+      return;
+    }
 
-    // Always cleanup before setting up a new channel
+    // Clean up any existing channel before creating a new one
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
+      isSubscribedRef.current = false;
     }
 
     const channelName = `realtime:public:jobs:notifications:${user.id}`;
@@ -107,25 +121,28 @@ export function useJobNotifications() {
         }
       );
 
-    (async () => {
+    const subscribeToChannel = async () => {
       try {
         await channel.subscribe();
-        if (isMounted) {
-          channelRef.current = channel;
-        }
+        channelRef.current = channel;
+        isSubscribedRef.current = true;
+        console.log("Successfully subscribed to job notifications channel");
       } catch (e) {
         console.error("Supabase channel subscribe exception", e);
+        isSubscribedRef.current = false;
       }
-    })();
+    };
+
+    subscribeToChannel();
 
     return () => {
-      isMounted = false;
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
+        isSubscribedRef.current = false;
       }
     };
-  }, [user, toast]);
+  }, [user?.id, toast]);
 
   const markAsRead = () => setHasUnread(false);
 
