@@ -7,7 +7,7 @@ import Wallet from '@/pages/Wallet';
 import Profile from '@/pages/Profile';
 import AuthWrapper from '@/components/auth/AuthWrapper';
 import { Home as HomeIcon, Briefcase, Plus, Wallet as WalletIcon, User } from 'lucide-react';
-import { logOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
@@ -107,7 +107,7 @@ const Index = () => {
                   onClick={handleSignOut}
                   className="mt-8 w-full flex items-center space-x-3 px-4 py-3 rounded-md text-left transition-colors text-red-600 hover:bg-red-50 border border-red-100"
                 >
-                  <logOut size={18} className="stroke-red-600" />
+                  <LogOut size={18} className="stroke-red-600" />
                   <span className="font-medium">Logout</span>
                 </button>
               )}
