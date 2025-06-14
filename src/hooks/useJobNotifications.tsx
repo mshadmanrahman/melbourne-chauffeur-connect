@@ -45,9 +45,11 @@ export function useJobNotifications() {
   const channelRef = useRef<any>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     if (!user) return;
 
-    // Cleanup any previous channel BEFORE creating a new one
+    // Always cleanup before setting up a new channel
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
@@ -99,17 +101,32 @@ export function useJobNotifications() {
 
             requestNotificationPermissionIfNeeded();
 
-            if (typeof window !== 'undefined' && Notification.permission === "granted") {
+            if (typeof window !== "undefined" && Notification.permission === "granted") {
               triggerBrowserNotification(title, desc);
             }
           }
         }
       );
 
-    channel.subscribe();
-    channelRef.current = channel;
+    // Only subscribe once per channel instance and AFTER setting handlers
+    // Also guard against useEffect re-entry
+    (async () => {
+      try {
+        const { error } = await channel.subscribe();
+        if (error) {
+          console.error("Supabase channel subscribe error", error);
+        } else {
+          if (isMounted) {
+            channelRef.current = channel;
+          }
+        }
+      } catch (e) {
+        console.error("Supabase channel subscribe exception", e);
+      }
+    })();
 
     return () => {
+      isMounted = false;
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;

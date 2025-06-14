@@ -133,6 +133,8 @@ export const useMyJobs = () => {
 
   // Realtime updates
   useEffect(() => {
+    let isMounted = true;
+
     if (!user) return;
 
     // Clean up any prior channel before creating a new one
@@ -157,10 +159,23 @@ export const useMyJobs = () => {
         }
       );
 
-    channel.subscribe();
-    channelRef.current = channel;
+    (async () => {
+      try {
+        const { error } = await channel.subscribe();
+        if (error) {
+          console.error("Supabase channel subscribe error", error);
+        } else {
+          if (isMounted) {
+            channelRef.current = channel;
+          }
+        }
+      } catch (e) {
+        console.error("Supabase channel subscribe exception", e);
+      }
+    })();
 
     return () => {
+      isMounted = false;
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
