@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 export default function StripeConnectButton({
   onboardingComplete,
@@ -44,7 +45,14 @@ export default function StripeConnectButton({
   };
 
   return (
-    <Button variant={onboardingComplete ? "secondary" : "default"} loading={loading} onClick={handleConnect}>
+    <Button
+      variant={onboardingComplete ? "secondary" : "default"}
+      onClick={handleConnect}
+      disabled={loading}
+    >
+      {loading && (
+        <Loader2 className="animate-spin mr-2" size={16} />
+      )}
       {onboardingComplete ? "Stripe Connected" : "Connect with Stripe"}
     </Button>
   );
