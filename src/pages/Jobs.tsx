@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import JobCard from '@/components/JobCard';
@@ -36,7 +35,9 @@ const dummyJobs = [
     payout: 95,
     status: 'available',
     vehicle_type: 'luxury',
-    poster_id: 'dummy-user-1'
+    poster_id: 'dummy-user-1',
+    poster_name: 'Michael Chen',
+    poster_rating: 4.8
   },
   {
     id: 'dummy-2',
@@ -46,7 +47,9 @@ const dummyJobs = [
     payout: 45,
     status: 'available',
     vehicle_type: 'standard',
-    poster_id: 'dummy-user-2'
+    poster_id: 'dummy-user-2',
+    poster_name: 'Sarah Williams',
+    poster_rating: 4.6
   },
   {
     id: 'dummy-3',
@@ -56,7 +59,9 @@ const dummyJobs = [
     payout: 35,
     status: 'available',
     vehicle_type: 'standard',
-    poster_id: 'dummy-user-3'
+    poster_id: 'dummy-user-3',
+    poster_name: 'James Thompson',
+    poster_rating: 4.9
   },
   {
     id: 'dummy-4',
@@ -66,7 +71,9 @@ const dummyJobs = [
     payout: 25,
     status: 'available',
     vehicle_type: 'standard',
-    poster_id: 'dummy-user-4'
+    poster_id: 'dummy-user-4',
+    poster_name: 'Emma Rodriguez',
+    poster_rating: 4.7
   },
   {
     id: 'dummy-5',
@@ -76,7 +83,9 @@ const dummyJobs = [
     payout: 65,
     status: 'available',
     vehicle_type: 'luxury',
-    poster_id: 'dummy-user-5'
+    poster_id: 'dummy-user-5',
+    poster_name: 'David Kumar',
+    poster_rating: 4.8
   },
   {
     id: 'dummy-6',
@@ -86,7 +95,9 @@ const dummyJobs = [
     payout: 30,
     status: 'available',
     vehicle_type: 'standard',
-    poster_id: 'dummy-user-6'
+    poster_id: 'dummy-user-6',
+    poster_name: 'Lisa Park',
+    poster_rating: 4.5
   },
   {
     id: 'dummy-7',
@@ -96,7 +107,9 @@ const dummyJobs = [
     payout: 40,
     status: 'available',
     vehicle_type: 'standard',
-    poster_id: 'dummy-user-7'
+    poster_id: 'dummy-user-7',
+    poster_name: 'Robert Zhang',
+    poster_rating: 4.6
   },
   {
     id: 'dummy-8',
@@ -106,7 +119,9 @@ const dummyJobs = [
     payout: 75,
     status: 'available',
     vehicle_type: 'luxury',
-    poster_id: 'dummy-user-8'
+    poster_id: 'dummy-user-8',
+    poster_name: 'Sophie Mitchell',
+    poster_rating: 4.9
   },
   {
     id: 'dummy-9',
@@ -116,7 +131,9 @@ const dummyJobs = [
     payout: 28,
     status: 'available',
     vehicle_type: 'standard',
-    poster_id: 'dummy-user-9'
+    poster_id: 'dummy-user-9',
+    poster_name: 'Mark Johnson',
+    poster_rating: 4.4
   },
   {
     id: 'dummy-10',
@@ -126,7 +143,9 @@ const dummyJobs = [
     payout: 85,
     status: 'available',
     vehicle_type: 'luxury',
-    poster_id: 'dummy-user-10'
+    poster_id: 'dummy-user-10',
+    poster_name: 'Anna Kowalski',
+    poster_rating: 4.8
   },
   {
     id: 'dummy-11',
@@ -136,7 +155,9 @@ const dummyJobs = [
     payout: 32,
     status: 'available',
     vehicle_type: 'standard',
-    poster_id: 'dummy-user-11'
+    poster_id: 'dummy-user-11',
+    poster_name: 'Tom Anderson',
+    poster_rating: 4.7
   },
   {
     id: 'dummy-12',
@@ -146,7 +167,9 @@ const dummyJobs = [
     payout: 38,
     status: 'available',
     vehicle_type: 'standard',
-    poster_id: 'dummy-user-12'
+    poster_id: 'dummy-user-12',
+    poster_name: 'Grace Lee',
+    poster_rating: 4.6
   },
   {
     id: 'dummy-13',
@@ -156,7 +179,9 @@ const dummyJobs = [
     payout: 55,
     status: 'available',
     vehicle_type: 'luxury',
-    poster_id: 'dummy-user-13'
+    poster_id: 'dummy-user-13',
+    poster_name: 'Alex Murphy',
+    poster_rating: 4.9
   },
   {
     id: 'dummy-14',
@@ -166,7 +191,9 @@ const dummyJobs = [
     payout: 120,
     status: 'available',
     vehicle_type: 'luxury',
-    poster_id: 'dummy-user-14'
+    poster_id: 'dummy-user-14',
+    poster_name: 'Rachel Green',
+    poster_rating: 4.8
   },
   {
     id: 'dummy-15',
@@ -176,7 +203,9 @@ const dummyJobs = [
     payout: 78,
     status: 'available',
     vehicle_type: 'standard',
-    poster_id: 'dummy-user-15'
+    poster_id: 'dummy-user-15',
+    poster_name: 'Ben Taylor',
+    poster_rating: 4.5
   }
 ];
 
@@ -318,8 +347,8 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
                       time={job.time}
                       payout={job.payout}
                       status={job.status === 'claimed' ? 'claimed' : 'available'}
-                      posterRating={4.8} // Dummy, see note below
-                      posterName={"N/A"}  // Dummy, need to join with profiles if needed
+                      posterRating={job.poster_rating || 4.8}
+                      posterName={job.poster_name || "Unknown User"}
                       vehicleType={job.vehicle_type || undefined}
                       onClaim={handleClaimJob}
                       onAuthRequired={onAuthRequired}
