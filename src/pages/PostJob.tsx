@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,11 +33,7 @@ const PostJob = () => {
     notes: ''
   });
 
-  useEffect(() => {
-    // Check if user has Stripe payment setup
-    // This would normally check against a database or Stripe API
-    setHasStripeSetup(false);
-  }, [user]);
+  // Removed the obsolete useEffect that called setHasStripeSetup(undefined)
 
   const handleStripeSetup = async () => {
     if (!user) {
