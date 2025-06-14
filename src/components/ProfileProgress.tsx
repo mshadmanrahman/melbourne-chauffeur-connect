@@ -1,15 +1,20 @@
-
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
 import { CheckCircle, Circle } from 'lucide-react';
+import StripeConnectButton from './StripeConnectButton';
+import { useAuth } from "@/contexts/AuthContext";
+import { useStripeAccount } from "@/hooks/useStripeAccount";
 
 interface ProfileProgressProps {
   profile: any;
   hasStripeConnected: boolean;
 }
 
-const ProfileProgress = ({ profile, hasStripeConnected }: ProfileProgressProps) => {
+const ProfileProgress = ({ profile, hasStripeConnected: _ }: ProfileProgressProps) => {
+  const { user } = useAuth();
+  const { stripeAccount, loading, refetch } = useStripeAccount(user?.id);
+
   const checklistItems = [
     {
       id: 'basic_info',
@@ -38,7 +43,7 @@ const ProfileProgress = ({ profile, hasStripeConnected }: ProfileProgressProps) 
     {
       id: 'stripe',
       label: 'Payment Setup',
-      completed: hasStripeConnected,
+      completed: !!stripeAccount?.onboarding_complete,
       description: 'Stripe payment integration'
     }
   ];
@@ -57,8 +62,8 @@ const ProfileProgress = ({ profile, hasStripeConnected }: ProfileProgressProps) 
       </div>
       
       <Progress value={progressPercentage} className="mb-4" />
-      
-      <div className="space-y-3">
+
+      <div className="space-y-3 mb-4">
         {checklistItems.map((item) => (
           <div key={item.id} className="flex items-center space-x-3">
             {item.completed ? (
@@ -77,6 +82,10 @@ const ProfileProgress = ({ profile, hasStripeConnected }: ProfileProgressProps) 
           </div>
         ))}
       </div>
+      <StripeConnectButton
+        onboardingComplete={!!stripeAccount?.onboarding_complete}
+        onOnboarded={refetch}
+      />
     </Card>
   );
 };
