@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { MapPin, Clock, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -58,10 +59,12 @@ const JobCard = ({
   };
 
   return (
-    <Card className="p-4 mb-3 border border-chauffer-gray-200 hover:border-chauffer-mint transition-colors">
+    <Card className="p-4 mb-3 border border-chauffer-gray-200 hover:border-chauffer-mint transition-colors 
+      sm:p-4 xs:p-3  rounded-lg
+      ">
       <div className="space-y-3">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-col xs:flex-row gap-2 xs:gap-0">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-chauffer-mint rounded-full flex items-center justify-center">
               <span className="text-white text-sm font-medium">
@@ -76,12 +79,11 @@ const JobCard = ({
               </div>
             </div>
           </div>
-          <div className="text-right">
+          <div className="text-right xs:text-right text-left w-full xs:w-auto mt-1 xs:mt-0">
             <p className="text-lg font-semibold text-chauffer-black">${payout}</p>
             <p className="text-xs text-chauffer-gray-500">after 10% fee</p>
           </div>
         </div>
-
         {/* Route */}
         <div className="space-y-2">
           <div className="flex items-start space-x-3">
@@ -90,16 +92,15 @@ const JobCard = ({
               <div className="w-px h-4 bg-chauffer-gray-200"></div>
               <MapPin size={8} className="text-chauffer-gray-500" />
             </div>
-            <div className="flex-1 space-y-2">
+            <div className="flex-1 space-y-1">
               <p className="text-sm text-chauffer-black font-medium">{pickup}</p>
               <p className="text-sm text-chauffer-gray-500">{dropoff}</p>
             </div>
           </div>
         </div>
-
         {/* Details */}
-        <div className="flex items-center justify-between text-xs text-chauffer-gray-500">
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between text-xs text-chauffer-gray-500 gap-1">
+          <div className="flex items-center space-x-4 xs:mb-0 mb-2">
             <div className="flex items-center space-x-1">
               <Clock size={12} />
               <span>{formatDate(time)} • {formatTime(time)}</span>
@@ -111,25 +112,24 @@ const JobCard = ({
             )}
           </div>
         </div>
-
         {/* Action */}
+        <div className="w-full">
         {status === 'available' && (
           <Button 
             onClick={handleClaimClick}
-            className="w-full bg-chauffer-mint hover:bg-chauffer-mint/90 text-white"
+            className="w-full bg-chauffer-mint hover:bg-chauffer-mint/90 text-white text-base py-3 rounded-lg"
           >
             {user ? 'Claim Job' : 'Sign In to Claim Job'}
           </Button>
         )}
-        
         {status === 'claimed' && (
-          <Button disabled className="w-full bg-chauffer-gray-200 text-chauffer-gray-500">
+          <Button disabled className="w-full bg-chauffer-gray-200 text-chauffer-gray-500 text-base py-3 rounded-lg">
             Job Claimed
           </Button>
         )}
+        </div>
       </div>
     </Card>
   );
 };
-
 export default JobCard;

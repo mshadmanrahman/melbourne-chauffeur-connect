@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,8 +34,8 @@ interface MyJobCardProps {
 const MyJobCard: React.FC<MyJobCardProps> = ({
   job, onStart, onComplete, onCancel, loadingAction = false
 }) => (
-  <Card key={job.id} className="p-4">
-    <div className="flex flex-col md:flex-row md:items-center justify-between space-y-3 md:space-y-0">
+  <Card key={job.id} className="p-4 rounded-lg">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div className="flex-1">
         <div className="flex items-center space-x-2 mb-2">
           <Badge className={getStatusColor(job.status)}>
@@ -51,7 +50,7 @@ const MyJobCard: React.FC<MyJobCardProps> = ({
               <p className="text-sm text-chauffer-gray-500">to {job.dropoff}</p>
             </div>
           </div>
-          <div className="flex items-center space-x-4 text-sm text-chauffer-gray-500">
+          <div className="flex flex-wrap items-center space-x-4 text-sm text-chauffer-gray-500">
             <div className="flex items-center space-x-1">
               <Clock size={14} />
               <span>
@@ -67,13 +66,13 @@ const MyJobCard: React.FC<MyJobCardProps> = ({
           </div>
         </div>
       </div>
-      <div className="flex space-x-2">
+      <div className="flex flex-row flex-wrap gap-2 w-full md:w-auto">
         {job.status === "active" && (
           <>
             <Button
               size="sm"
               onClick={() => onStart(job.id)}
-              className="bg-chauffer-mint hover:bg-chauffer-mint/90"
+              className="bg-chauffer-mint hover:bg-chauffer-mint/90 w-full md:w-auto"
               disabled={loadingAction}
             >
               <Play size={14} className="mr-1" />
@@ -83,7 +82,7 @@ const MyJobCard: React.FC<MyJobCardProps> = ({
               size="sm"
               variant="outline"
               onClick={() => onCancel(job.id)}
-              className="text-red-600 border-red-200 hover:bg-red-50"
+              className="text-red-600 border-red-200 hover:bg-red-50 w-full md:w-auto"
               disabled={loadingAction}
             >
               <X size={14} className="mr-1" />
@@ -95,7 +94,7 @@ const MyJobCard: React.FC<MyJobCardProps> = ({
           <Button
             size="sm"
             onClick={() => onComplete(job.id)}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 w-full md:w-auto"
             disabled={loadingAction}
           >
             <CheckCircle size={14} className="mr-1" />

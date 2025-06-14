@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -15,22 +14,19 @@ interface JobDetailsModalProps {
 
 const JobDetailsModal = ({ job, isOpen, onClose, onClaim }: JobDetailsModalProps) => {
   if (!job) return null;
-
   const handleClaim = () => {
     onClaim(job.id);
     onClose();
   };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl w-[95vw] p-3 xs:p-6">
         <DialogHeader>
-          <DialogTitle>Job Details</DialogTitle>
+          <DialogTitle className="text-lg xs:text-xl">Job Details</DialogTitle>
         </DialogHeader>
-        
         <div className="space-y-6">
           {/* Route Information */}
-          <Card className="p-4">
+          <Card className="p-3 xs:p-4">
             <div className="flex items-center space-x-2 mb-3">
               <MapPin size={20} className="text-chauffer-mint" />
               <h3 className="font-semibold">Route</h3>
@@ -48,8 +44,8 @@ const JobDetailsModal = ({ job, isOpen, onClose, onClaim }: JobDetailsModalProps
           </Card>
 
           {/* Time & Payment */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="p-4">
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
+            <Card className="p-3 xs:p-4">
               <div className="flex items-center space-x-2 mb-2">
                 <Clock size={16} className="text-chauffer-mint" />
                 <h4 className="font-medium">Schedule</h4>
@@ -65,7 +61,7 @@ const JobDetailsModal = ({ job, isOpen, onClose, onClaim }: JobDetailsModalProps
               </p>
             </Card>
 
-            <Card className="p-4">
+            <Card className="p-3 xs:p-4">
               <div className="flex items-center space-x-2 mb-2">
                 <DollarSign size={16} className="text-chauffer-mint" />
                 <h4 className="font-medium">Payment</h4>
@@ -76,7 +72,7 @@ const JobDetailsModal = ({ job, isOpen, onClose, onClaim }: JobDetailsModalProps
           </div>
 
           {/* Job Poster Info */}
-          <Card className="p-4">
+          <Card className="p-3 xs:p-4">
             <div className="flex items-center space-x-2 mb-3">
               <User size={20} className="text-chauffer-mint" />
               <h3 className="font-semibold">Job Poster</h3>
@@ -94,7 +90,7 @@ const JobDetailsModal = ({ job, isOpen, onClose, onClaim }: JobDetailsModalProps
 
           {/* Vehicle Requirements */}
           {job.vehicleType && (
-            <Card className="p-4">
+            <Card className="p-3 xs:p-4">
               <h3 className="font-semibold mb-2">Vehicle Requirements</h3>
               <span className="px-3 py-1 bg-chauffer-mint/10 text-chauffer-mint text-sm rounded-full">
                 {job.vehicleType}
@@ -103,15 +99,15 @@ const JobDetailsModal = ({ job, isOpen, onClose, onClaim }: JobDetailsModalProps
           )}
 
           {/* Action Buttons */}
-          <div className="flex space-x-3">
+          <div className="flex flex-col xs:flex-row gap-2">
             <Button
               onClick={handleClaim}
-              className="flex-1 bg-chauffer-mint hover:bg-chauffer-mint/90"
+              className="flex-1 bg-chauffer-mint hover:bg-chauffer-mint/90 text-base py-3"
               disabled={job.status === 'claimed'}
             >
               {job.status === 'claimed' ? 'Already Claimed' : 'Claim Job'}
             </Button>
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose} className="flex-1 text-base py-3">
               Close
             </Button>
           </div>

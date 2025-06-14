@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card } from "@/components/ui/card";
 import MyJobCard from "./MyJobCard";
@@ -16,12 +15,11 @@ const MyJobsList: React.FC<MyJobsListProps> = ({
 }) => {
   if (jobs.length === 0) {
     return (
-      <Card className="p-8 text-center">
+      <Card className="p-8 text-center rounded-lg">
         <p className="text-chauffer-gray-500">No jobs found.</p>
       </Card>
     );
   }
-
   return (
     <div className="space-y-4">
       {jobs.map((job) => (
