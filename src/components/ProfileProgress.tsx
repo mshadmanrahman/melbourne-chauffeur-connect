@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useEffect } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
 import { CheckCircle, Circle } from 'lucide-react';
@@ -14,6 +15,21 @@ interface ProfileProgressProps {
 const ProfileProgress = ({ profile, hasStripeConnected: _ }: ProfileProgressProps) => {
   const { user } = useAuth();
   const { stripeAccount, loading, refetch } = useStripeAccount(user?.id);
+
+  // Add debugging logs
+  useEffect(() => {
+    console.log('ProfileProgress - stripeAccount:', stripeAccount);
+    console.log('ProfileProgress - loading:', loading);
+    console.log('ProfileProgress - onboarding_complete:', stripeAccount?.onboarding_complete);
+  }, [stripeAccount, loading]);
+
+  // Auto-refresh when component mounts to check latest status
+  useEffect(() => {
+    if (user?.id) {
+      console.log('ProfileProgress - Auto-refreshing Stripe account status');
+      refetch();
+    }
+  }, [user?.id, refetch]);
 
   const checklistItems = [
     {
@@ -82,6 +98,14 @@ const ProfileProgress = ({ profile, hasStripeConnected: _ }: ProfileProgressProp
           </div>
         ))}
       </div>
+      
+      {/* Debug info */}
+      <div className="mb-4 p-2 bg-gray-100 rounded text-xs">
+        <p>Debug: Stripe Account ID: {stripeAccount?.stripe_account_id || 'None'}</p>
+        <p>Debug: Onboarding Complete: {stripeAccount?.onboarding_complete ? 'Yes' : 'No'}</p>
+        <p>Debug: Loading: {loading ? 'Yes' : 'No'}</p>
+      </div>
+      
       <StripeConnectButton
         onboardingComplete={!!stripeAccount?.onboarding_complete}
         onOnboarded={refetch}

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 
 export default function StripeConnectButton({
   onboardingComplete,
@@ -26,10 +26,19 @@ export default function StripeConnectButton({
         });
         return;
       }
+      
+      console.log('Stripe onboard response:', data);
+      
       if (data.onboarding_url) {
-        window.open(data.onboarding_url, "_blank");
-        // Poll for completion after a delay (emulate user returning)
-        setTimeout(onOnboarded, 5000);
+        // Open in same tab instead of new tab for better redirect handling
+        window.location.href = data.onboarding_url;
+      } else if (data.onboarding_complete) {
+        // Already complete, just refresh the status
+        toast({
+          title: "Stripe Connected",
+          description: "Your Stripe account is already set up!",
+        });
+        onOnboarded();
       } else {
         toast({
           title: "Stripe error",
@@ -44,16 +53,82 @@ export default function StripeConnectButton({
     }
   };
 
+  const handleRefresh = async () => {
+    setLoading(true);
+    try {
+      // Call the stripe-onboard function to refresh status
+      const { data, error } = await supabase.functions.invoke("stripe-onboard");
+      if (error) {
+        console.error('Refresh error:', error);
+        toast({
+          title: "Refresh failed",
+          description: error.message,
+        });
+      } else {
+        console.log('Refresh response:', data);
+        onOnboarded();
+        if (data.onboarding_complete) {
+          toast({
+            title: "Status updated",
+            description: "Your Stripe connection is verified!",
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Refresh error:', err);
+      toast({ title: "Refresh Error", description: String(err) });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (onboardingComplete) {
+    return (
+      <div className="flex gap-2">
+        <Button variant="secondary" disabled>
+          Stripe Connected ✓
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefresh}
+          disabled={loading}
+        >
+          {loading ? (
+            <Loader2 className="animate-spin" size={16} />
+          ) : (
+            <RefreshCw size={16} />
+          )}
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <Button
-      variant={onboardingComplete ? "secondary" : "default"}
-      onClick={handleConnect}
-      disabled={loading}
-    >
-      {loading && (
-        <Loader2 className="animate-spin mr-2" size={16} />
-      )}
-      {onboardingComplete ? "Stripe Connected" : "Connect with Stripe"}
-    </Button>
+    <div className="flex gap-2">
+      <Button
+        variant="default"
+        onClick={handleConnect}
+        disabled={loading}
+      >
+        {loading && (
+          <Loader2 className="animate-spin mr-2" size={16} />
+        )}
+        Connect with Stripe
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleRefresh}
+        disabled={loading}
+        title="Refresh Stripe status"
+      >
+        {loading ? (
+          <Loader2 className="animate-spin" size={16} />
+        ) : (
+          <RefreshCw size={16} />
+        )}
+      </Button>
+    </div>
   );
 }
