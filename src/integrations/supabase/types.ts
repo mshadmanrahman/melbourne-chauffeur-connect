@@ -9,6 +9,66 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      jobs: {
+        Row: {
+          claimed_by: string | null
+          created_at: string
+          dropoff: string
+          id: string
+          notes: string | null
+          payout: number
+          pickup: string
+          poster_id: string
+          status: string
+          time: string
+          updated_at: string
+          vehicle_type: string | null
+        }
+        Insert: {
+          claimed_by?: string | null
+          created_at?: string
+          dropoff: string
+          id?: string
+          notes?: string | null
+          payout: number
+          pickup: string
+          poster_id: string
+          status?: string
+          time: string
+          updated_at?: string
+          vehicle_type?: string | null
+        }
+        Update: {
+          claimed_by?: string | null
+          created_at?: string
+          dropoff?: string
+          id?: string
+          notes?: string | null
+          payout?: number
+          pickup?: string
+          poster_id?: string
+          status?: string
+          time?: string
+          updated_at?: string
+          vehicle_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_claimer"
+            columns: ["claimed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_poster"
+            columns: ["poster_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
