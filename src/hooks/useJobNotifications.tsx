@@ -20,6 +20,23 @@ type Job = {
   updated_at: string;
 };
 
+function triggerBrowserNotification(title: string, body: string) {
+  if (typeof window === "undefined" || typeof Notification === "undefined") return;
+  if (Notification.permission === "granted") {
+    new Notification(title, {
+      body,
+      icon: "/favicon.ico", // Change to your app icon if needed
+    });
+  }
+}
+
+function requestNotificationPermissionIfNeeded() {
+  if (typeof window === "undefined" || typeof Notification === "undefined") return;
+  if (Notification.permission === "default") {
+    Notification.requestPermission();
+  }
+}
+
 export function useJobNotifications() {
   const { user } = useAuth();
   const [hasUnread, setHasUnread] = useState(false);
@@ -47,6 +64,7 @@ export function useJobNotifications() {
           ) {
             handledJobIds.current.add(job.id);
             setHasUnread(true);
+
             // Show toast on job status change
             let desc = "";
             switch (job.status) {
@@ -65,10 +83,20 @@ export function useJobNotifications() {
               default:
                 desc = "There's an update to one of your jobs.";
             }
+            const title = "Job Update";
+
             toast({
-              title: "Job Update",
+              title,
               description: desc,
             });
+
+            // Request permission on first relevant event
+            requestNotificationPermissionIfNeeded();
+
+            // Only trigger system notification if allowed
+            if (typeof window !== 'undefined' && Notification.permission === "granted") {
+              triggerBrowserNotification(title, desc);
+            }
           }
         }
       )
@@ -84,3 +112,4 @@ export function useJobNotifications() {
 
   return { hasUnread, markAsRead };
 }
+
