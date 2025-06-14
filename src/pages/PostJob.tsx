@@ -11,10 +11,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MapPin, Clock, DollarSign, CreditCard, AlertCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const PostJob = () => {
   const { user } = useAuth();
   const [hasStripeSetup, setHasStripeSetup] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     pickup: '',
     dropoff: '',
@@ -39,9 +41,9 @@ const PostJob = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -59,12 +61,44 @@ const PostJob = () => {
       });
       return;
     }
-    
+
     // Basic validation
     if (!formData.pickup || !formData.dropoff || !formData.date || !formData.time || !formData.payout) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    // Combine date and time into UTC timestamp string for Supabase
+    const isoTime = new Date(
+      `${formData.date}T${formData.time}`
+    ).toISOString();
+
+    const newJob = {
+      pickup: formData.pickup,
+      dropoff: formData.dropoff,
+      time: isoTime,
+      payout: Number(formData.payout),
+      vehicle_type: formData.vehicleType || null,
+      notes: formData.notes || null,
+      poster_id: user.id
+    };
+
+    const { error } = await supabase
+      .from('jobs')
+      .insert([newJob]);
+
+    setLoading(false);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
         variant: "destructive"
       });
       return;
@@ -91,7 +125,6 @@ const PostJob = () => {
     return (
       <div className="min-h-screen bg-chauffer-gray-50">
         <Header title="Post a Job" showNotifications={false} />
-        
         <div className="px-4 md:px-8 py-6 pb-20 md:pb-8 max-w-2xl md:mx-auto">
           <Card className="p-8 text-center">
             <AlertCircle size={48} className="text-chauffer-gray-400 mx-auto mb-4" />
@@ -111,15 +144,15 @@ const PostJob = () => {
   return (
     <div className="min-h-screen bg-chauffer-gray-50">
       <Header title="Post a Job" showNotifications={false} />
-      
+
       <div className="px-4 md:px-8 py-6 pb-20 md:pb-8 max-w-2xl md:mx-auto">
         {!hasStripeSetup && (
           <Alert className="mb-6 border-orange-200 bg-orange-50">
             <CreditCard className="h-4 w-4 text-orange-600" />
             <AlertDescription className="text-orange-800">
-              You need to set up payment details before posting jobs. 
-              <Button 
-                variant="link" 
+              You need to set up payment details before posting jobs.
+              <Button
+                variant="link"
                 className="text-orange-600 p-0 ml-1 h-auto"
                 onClick={handleStripeSetup}
               >
@@ -137,7 +170,7 @@ const PostJob = () => {
                 <MapPin size={20} className="text-chauffer-mint" />
                 <h3 className="font-semibold text-chauffer-black">Trip Details</h3>
               </div>
-              
+
               <div className="space-y-3">
                 <div>
                   <Label htmlFor="pickup">Pickup Location *</Label>
@@ -149,7 +182,7 @@ const PostJob = () => {
                     className="mt-1"
                   />
                 </div>
-                
+
                 <div>
                   <Label htmlFor="dropoff">Drop-off Location *</Label>
                   <Input
@@ -169,7 +202,7 @@ const PostJob = () => {
                 <Clock size={20} className="text-chauffer-mint" />
                 <h3 className="font-semibold text-chauffer-black">Schedule</h3>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <Label htmlFor="date">Date *</Label>
@@ -181,7 +214,7 @@ const PostJob = () => {
                     className="mt-1"
                   />
                 </div>
-                
+
                 <div>
                   <Label htmlFor="time">Time *</Label>
                   <Input
@@ -201,7 +234,7 @@ const PostJob = () => {
                 <DollarSign size={20} className="text-chauffer-mint" />
                 <h3 className="font-semibold text-chauffer-black">Payment</h3>
               </div>
-              
+
               <div>
                 <Label htmlFor="payout">Payout Amount (AUD) *</Label>
                 <Input
@@ -251,12 +284,12 @@ const PostJob = () => {
               </div>
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full bg-chauffer-mint hover:bg-chauffer-mint/90 text-white h-12"
-              disabled={!hasStripeSetup}
+              disabled={!hasStripeSetup || loading}
             >
-              {!hasStripeSetup ? 'Set Up Payments First' : 'Post Job'}
+              {loading ? 'Posting...' : !hasStripeSetup ? 'Set Up Payments First' : 'Post Job'}
             </Button>
           </form>
         </Card>
@@ -266,3 +299,5 @@ const PostJob = () => {
 };
 
 export default PostJob;
+
+// (NOTE: This file is getting long! After this change, consider splitting or refactoring it for maintainability.)
