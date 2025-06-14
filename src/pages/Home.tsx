@@ -8,12 +8,14 @@ import CTASection from '@/components/home/CTASection';
 
 interface HomeProps {
   onAuthRequired?: () => void;
+  setActiveTab?: (tab: string) => void;
 }
 
-const Home = ({ onAuthRequired }: HomeProps) => {
+const Home = ({ onAuthRequired, setActiveTab }: HomeProps) => {
+  // Prefer index-driven tab change; fallback to hash as last resort
   const handleViewAllJobs = () => {
-    // This will be handled by the parent component's navigation
-    window.location.hash = '#jobs';
+    if (setActiveTab) setActiveTab('jobs');
+    else window.location.hash = '#jobs';
   };
 
   return (

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Home from '@/pages/Home';
@@ -17,10 +16,15 @@ const Index = () => {
     setAuthMode('login');
   };
 
+  // New: handler to be passed down so child components can change tab
+  const handleSetTab = (tab: string) => {
+    setActiveTab(tab);
+  };
+
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'home':
-        return <Home onAuthRequired={handleAuthRequired} />;
+        return <Home onAuthRequired={handleAuthRequired} setActiveTab={handleSetTab} />;
       case 'jobs':
         return <Jobs onAuthRequired={handleAuthRequired} />;
       case 'post':
@@ -30,7 +34,7 @@ const Index = () => {
       case 'profile':
         return <Profile />;
       default:
-        return <Home onAuthRequired={handleAuthRequired} />;
+        return <Home onAuthRequired={handleAuthRequired} setActiveTab={handleSetTab} />;
     }
   };
 
@@ -39,7 +43,7 @@ const Index = () => {
       <div className="min-h-screen bg-chauffer-gray-50">
         {/* Desktop Layout */}
         <div className="hidden md:flex">
-          {/* Desktop Sidebar */}
+          {/* Sidebar */}
           <div className="w-64 bg-white border-r border-chauffer-gray-200 min-h-screen fixed left-0 top-0 z-40">
             <div className="p-6 border-b border-chauffer-gray-200">
               <h1 className="text-2xl font-bold text-chauffer-black">ChaufferLink</h1>
@@ -75,13 +79,13 @@ const Index = () => {
             </nav>
           </div>
 
-          {/* Desktop Main Content */}
+          {/* Main Content */}
           <div className="flex-1 ml-64 flex flex-col min-h-screen">
             <div className="flex-1">
               {renderActiveTab()}
             </div>
             
-            {/* Desktop Footer */}
+            {/* Footer */}
             <footer className="bg-white border-t border-chauffer-gray-200 py-4 px-8">
               <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-sm text-chauffer-gray-500">
                 <div className="flex items-center space-x-1">
