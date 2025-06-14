@@ -26,6 +26,160 @@ const fetchJobs = async () => {
   return data;
 };
 
+// Dummy data for demonstration
+const dummyJobs = [
+  {
+    id: 'dummy-1',
+    pickup: 'Crown Casino, Melbourne VIC 3006',
+    dropoff: 'Melbourne Airport Terminal 1, Tullamarine VIC 3045',
+    time: '2024-06-15T14:30:00',
+    payout: 95,
+    status: 'available',
+    vehicle_type: 'luxury',
+    poster_id: 'dummy-user-1'
+  },
+  {
+    id: 'dummy-2',
+    pickup: 'Collins Street, Melbourne CBD',
+    dropoff: 'Brighton Beach Hotel, Brighton VIC',
+    time: '2024-06-15T16:45:00',
+    payout: 45,
+    status: 'available',
+    vehicle_type: 'standard',
+    poster_id: 'dummy-user-2'
+  },
+  {
+    id: 'dummy-3',
+    pickup: 'Flinders Street Station, Melbourne VIC',
+    dropoff: 'St Kilda Football Club, Moorabbin VIC',
+    time: '2024-06-15T10:15:00',
+    payout: 35,
+    status: 'available',
+    vehicle_type: 'standard',
+    poster_id: 'dummy-user-3'
+  },
+  {
+    id: 'dummy-4',
+    pickup: 'Melbourne Central Station, Melbourne VIC',
+    dropoff: 'RMIT University, Brunswick VIC',
+    time: '2024-06-15T08:30:00',
+    payout: 25,
+    status: 'available',
+    vehicle_type: 'standard',
+    poster_id: 'dummy-user-4'
+  },
+  {
+    id: 'dummy-5',
+    pickup: 'The Ritz-Carlton Melbourne',
+    dropoff: 'Royal Botanic Gardens Melbourne',
+    time: '2024-06-15T12:00:00',
+    payout: 65,
+    status: 'available',
+    vehicle_type: 'luxury',
+    poster_id: 'dummy-user-5'
+  },
+  {
+    id: 'dummy-6',
+    pickup: 'Southern Cross Station, Melbourne VIC',
+    dropoff: 'Docklands Stadium, Melbourne VIC',
+    time: '2024-06-15T19:30:00',
+    payout: 30,
+    status: 'available',
+    vehicle_type: 'standard',
+    poster_id: 'dummy-user-6'
+  },
+  {
+    id: 'dummy-7',
+    pickup: 'Queen Victoria Market, Melbourne VIC',
+    dropoff: 'Melbourne Zoo, Parkville VIC',
+    time: '2024-06-16T09:00:00',
+    payout: 40,
+    status: 'available',
+    vehicle_type: 'standard',
+    poster_id: 'dummy-user-7'
+  },
+  {
+    id: 'dummy-8',
+    pickup: 'Park Hyatt Melbourne',
+    dropoff: 'Melbourne Cricket Ground (MCG)',
+    time: '2024-06-16T15:20:00',
+    payout: 75,
+    status: 'available',
+    vehicle_type: 'luxury',
+    poster_id: 'dummy-user-8'
+  },
+  {
+    id: 'dummy-9',
+    pickup: 'Chapel Street, Prahran VIC',
+    dropoff: 'Chadstone Shopping Centre, Malvern East VIC',
+    time: '2024-06-16T11:15:00',
+    payout: 28,
+    status: 'available',
+    vehicle_type: 'standard',
+    poster_id: 'dummy-user-9'
+  },
+  {
+    id: 'dummy-10',
+    pickup: 'Melbourne Airport Terminal 3',
+    dropoff: 'Crown Towers Melbourne',
+    time: '2024-06-16T18:45:00',
+    payout: 85,
+    status: 'available',
+    vehicle_type: 'luxury',
+    poster_id: 'dummy-user-10'
+  },
+  {
+    id: 'dummy-11',
+    pickup: 'Federation Square, Melbourne VIC',
+    dropoff: 'University of Melbourne, Parkville VIC',
+    time: '2024-06-17T07:45:00',
+    payout: 32,
+    status: 'available',
+    vehicle_type: 'standard',
+    poster_id: 'dummy-user-11'
+  },
+  {
+    id: 'dummy-12',
+    pickup: 'Eureka Tower, Southbank VIC',
+    dropoff: 'St Kilda Beach, St Kilda VIC',
+    time: '2024-06-17T13:30:00',
+    payout: 38,
+    status: 'available',
+    vehicle_type: 'standard',
+    poster_id: 'dummy-user-12'
+  },
+  {
+    id: 'dummy-13',
+    pickup: 'Grand Hyatt Melbourne',
+    dropoff: 'Flemington Racecourse, Flemington VIC',
+    time: '2024-06-17T14:00:00',
+    payout: 55,
+    status: 'available',
+    vehicle_type: 'luxury',
+    poster_id: 'dummy-user-13'
+  },
+  {
+    id: 'dummy-14',
+    pickup: 'Richmond Station, Richmond VIC',
+    dropoff: 'Yarra Valley, Healesville VIC',
+    time: '2024-06-17T10:30:00',
+    payout: 120,
+    status: 'available',
+    vehicle_type: 'luxury',
+    poster_id: 'dummy-user-14'
+  },
+  {
+    id: 'dummy-15',
+    pickup: 'Melbourne Convention Centre, South Wharf VIC',
+    dropoff: 'Tullamarine Airport, Terminal 2',
+    time: '2024-06-17T16:15:00',
+    payout: 78,
+    status: 'available',
+    vehicle_type: 'standard',
+    poster_id: 'dummy-user-15'
+  }
+];
+
 const Jobs = ({ onAuthRequired }: JobsProps) => {
   const { user } = useAuth();
   const [selectedJob, setSelectedJob] = useState<any>(null);
@@ -81,12 +235,23 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
       onAuthRequired?.();
       return;
     }
+    // Only allow claiming real jobs, not dummy data
+    if (jobId.startsWith('dummy-')) {
+      toast({
+        title: 'Demo Job',
+        description: 'This is demo data. Please post a real job to test the claiming feature.',
+        variant: 'default'
+      });
+      setIsDetailsModalOpen(false);
+      return;
+    }
     claimJobMutation.mutate(jobId);
     setIsDetailsModalOpen(false);
   };
 
-  // Filter logic for "Available" tab jobs (exclude claimed, completed, and your own claimed jobs)
-  const availableJobs = jobs.filter((job: any) =>
+  // Combine real jobs with dummy data, filter logic for "Available" tab jobs
+  const allJobs = [...jobs, ...dummyJobs];
+  const availableJobs = allJobs.filter((job: any) =>
     job.status === 'available' && job.poster_id !== user?.id
   );
 
