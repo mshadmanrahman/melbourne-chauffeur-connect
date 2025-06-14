@@ -25,7 +25,7 @@ function triggerBrowserNotification(title: string, body: string) {
   if (Notification.permission === "granted") {
     new Notification(title, {
       body,
-      icon: "/favicon.ico", // Change to your app icon if needed
+      icon: "/favicon.ico",
     });
   }
 }
@@ -42,11 +42,17 @@ export function useJobNotifications() {
   const [hasUnread, setHasUnread] = useState(false);
   const handledJobIds = useRef<Set<string>>(new Set());
   const { toast } = useToast();
+  const channelRef = useRef<any>(null);
 
   useEffect(() => {
     if (!user) return;
 
-    // Use a unique channel name per user to avoid duplicate subscriptions
+    // Cleanup any previous channel BEFORE creating a new one
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+
     const channelName = `realtime:public:jobs:notifications:${user.id}`;
     const channel = supabase
       .channel(channelName)
@@ -67,7 +73,6 @@ export function useJobNotifications() {
             handledJobIds.current.add(job.id);
             setHasUnread(true);
 
-            // Show toast on job status change
             let desc = "";
             switch (job.status) {
               case "in_progress":
@@ -92,10 +97,8 @@ export function useJobNotifications() {
               description: desc,
             });
 
-            // Request permission on first relevant event
             requestNotificationPermissionIfNeeded();
 
-            // Only trigger system notification if allowed
             if (typeof window !== 'undefined' && Notification.permission === "granted") {
               triggerBrowserNotification(title, desc);
             }
@@ -104,13 +107,16 @@ export function useJobNotifications() {
       );
 
     channel.subscribe();
+    channelRef.current = channel;
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
   }, [user, toast]);
 
-  // Mark notifications as read (used when bell is clicked)
   const markAsRead = () => setHasUnread(false);
 
   return { hasUnread, markAsRead };

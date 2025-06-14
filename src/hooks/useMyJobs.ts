@@ -1,8 +1,7 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "@/hooks/use-toast";
 
 export const useMyJobs = () => {
@@ -12,6 +11,7 @@ export const useMyJobs = () => {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const [tab, setTab] = useState<"posted" | "claimed">("claimed");
+  const channelRef = useRef<any>(null);
 
   // Fetch jobs posted by this user
   const { data: postedJobs = [], isLoading: loadingPosted } = useQuery({
@@ -135,7 +135,12 @@ export const useMyJobs = () => {
   useEffect(() => {
     if (!user) return;
 
-    // Use a unique channel name per user to avoid double subscribe issues
+    // Clean up any prior channel before creating a new one
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+
     const channelName = `realtime:public:jobs:${user.id}`;
     const channel = supabase
       .channel(channelName)
@@ -152,11 +157,14 @@ export const useMyJobs = () => {
         }
       );
 
-    // Subscribe & track the returned promise for handling errors (if desired)
     channel.subscribe();
+    channelRef.current = channel;
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, queryClient]);
@@ -206,4 +214,3 @@ export const useMyJobs = () => {
     openCancelModal,
   };
 };
-
