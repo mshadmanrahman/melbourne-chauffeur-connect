@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStripeAccount } from '@/hooks/useStripeAccount';
 import StripeConnectButton from './StripeConnectButton';
-import { CreditCard, CheckCircle, XCircle, Settings, ExternalLink } from 'lucide-react';
+import { CreditCard, CheckCircle, XCircle, Settings, ExternalLink, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -48,6 +48,12 @@ const PaymentSettingsDialog = ({ open, onOpenChange }: PaymentSettingsDialogProp
         toast({
           title: "Payment management opened",
           description: "Manage your payment methods in the new tab.",
+        });
+      } else if (data?.error) {
+        toast({
+          title: "Error",
+          description: data.error,
+          variant: "destructive",
         });
       } else {
         toast({
@@ -142,6 +148,21 @@ const PaymentSettingsDialog = ({ open, onOpenChange }: PaymentSettingsDialogProp
             </Card>
           )}
 
+          {/* Setup Instructions */}
+          <Card className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <AlertCircle size={16} className="text-blue-500" />
+              <h3 className="font-medium">Setup Instructions</h3>
+            </div>
+            
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>• First time setup may require Stripe dashboard configuration</p>
+              <p>• You'll be redirected to Stripe's secure portal</p>
+              <p>• All payment data is handled by Stripe for security</p>
+              <p>• Changes made in Stripe will be reflected here automatically</p>
+            </div>
+          </Card>
+
           {/* Payment Information */}
           <Card className="p-4">
             <h3 className="font-medium mb-3">Payment Information</h3>
@@ -160,17 +181,6 @@ const PaymentSettingsDialog = ({ open, onOpenChange }: PaymentSettingsDialogProp
                 <span className="text-muted-foreground">Payout Schedule:</span>
                 <span>Daily</span>
               </div>
-            </div>
-          </Card>
-
-          {/* Additional Settings */}
-          <Card className="p-4">
-            <h3 className="font-medium mb-3">Additional Settings</h3>
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>• Payments are processed through Stripe Connect</p>
-              <p>• Earnings are automatically transferred to your bank account</p>
-              <p>• Transaction fees may apply as per Stripe's pricing</p>
-              <p>• You can view detailed payment history in your Stripe dashboard</p>
             </div>
           </Card>
         </div>

@@ -66,19 +66,74 @@ serve(async (req) => {
       log("Found existing customer", { customerId });
     }
 
-    // Create customer portal session
+    // Create customer portal session with configuration
     const origin = req.headers.get("origin") || "http://localhost:3000";
-    const session = await stripe.billingPortal.sessions.create({
-      customer: customerId,
-      return_url: `${origin}/profile`,
-    });
+    
+    try {
+      // Try to create the session with default configuration
+      const session = await stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: `${origin}/profile`,
+      });
 
-    log("Customer portal session created", { sessionUrl: session.url });
+      log("Customer portal session created", { sessionUrl: session.url });
 
-    return new Response(JSON.stringify({ url: session.url }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
-    });
+      return new Response(JSON.stringify({ url: session.url }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    } catch (portalError: any) {
+      log("Portal creation failed, trying with configuration", portalError);
+      
+      if (portalError.code === 'billing_portal_configuration_not_ready') {
+        // Create a basic configuration first
+        try {
+          const configuration = await stripe.billingPortal.configurations.create({
+            business_profile: {
+              headline: 'Manage your billing information',
+            },
+            features: {
+              payment_method_update: { enabled: true },
+              invoice_history: { enabled: true },
+            },
+          });
+          
+          log("Created billing portal configuration", { configId: configuration.id });
+          
+          // Now create the session with the new configuration
+          const session = await stripe.billingPortal.sessions.create({
+            customer: customerId,
+            configuration: configuration.id,
+            return_url: `${origin}/profile`,
+          });
+
+          log("Customer portal session created with config", { sessionUrl: session.url });
+
+          return new Response(JSON.stringify({ url: session.url }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        } catch (configError) {
+          log("Configuration creation failed", configError);
+          return new Response(JSON.stringify({ 
+            error: "Unable to set up payment management. Please contact support.",
+            details: "Stripe billing portal configuration failed"
+          }), {
+            status: 500,
+            headers: corsHeaders,
+          });
+        }
+      } else {
+        // Handle other portal errors
+        return new Response(JSON.stringify({ 
+          error: "Unable to open payment management portal",
+          details: portalError.message || "Unknown error"
+        }), {
+          status: 500,
+          headers: corsHeaders,
+        });
+      }
+    }
   } catch (err) {
     log("ERROR", err);
     return new Response(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }), {
