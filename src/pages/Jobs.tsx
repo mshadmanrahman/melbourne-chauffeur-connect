@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import JobCard from '@/components/JobCard';
@@ -213,6 +214,7 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
   const { user } = useAuth();
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'today' | 'high-pay' | 'luxury'>('all');
 
   const queryClient = useQueryClient();
   const { data: jobs = [], isLoading, isError } = useQuery({
@@ -284,6 +286,32 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
     job.status === 'available' && job.poster_id !== user?.id
   );
 
+  // Filter jobs based on active filter
+  const getFilteredJobs = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    switch (activeFilter) {
+      case 'today':
+        return availableJobs.filter((job: any) => {
+          const jobDate = new Date(job.time);
+          return jobDate >= today && jobDate < tomorrow;
+        });
+      case 'high-pay':
+        return availableJobs.filter((job: any) => job.payout >= 60);
+      case 'luxury':
+        return availableJobs.filter((job: any) => 
+          job.vehicle_type?.toLowerCase() === 'luxury'
+        );
+      default:
+        return availableJobs;
+    }
+  };
+
+  const filteredJobs = getFilteredJobs();
+
   return (
     <div className="min-h-screen bg-chauffer-gray-50">
       <Header title="Jobs" />
@@ -294,18 +322,54 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
             <TabsTrigger value="my-jobs">My Jobs</TabsTrigger>
           </TabsList>
           <TabsContent value="available" className="space-y-4">
-            {/* Filters (not yet wired to DB data) */}
+            {/* Filters */}
             <div className="flex space-x-2 mb-4 overflow-x-auto">
-              <Button variant="outline" size="sm" className="whitespace-nowrap border-chauffer-mint text-chauffer-mint">
+              <Button 
+                variant={activeFilter === 'all' ? 'default' : 'outline'} 
+                size="sm" 
+                className={`whitespace-nowrap ${
+                  activeFilter === 'all' 
+                    ? 'bg-chauffer-mint text-white' 
+                    : 'border-chauffer-mint text-chauffer-mint hover:bg-chauffer-mint hover:text-white'
+                }`}
+                onClick={() => setActiveFilter('all')}
+              >
                 All Jobs
               </Button>
-              <Button variant="outline" size="sm" className="whitespace-nowrap">
+              <Button 
+                variant={activeFilter === 'today' ? 'default' : 'outline'} 
+                size="sm" 
+                className={`whitespace-nowrap ${
+                  activeFilter === 'today' 
+                    ? 'bg-chauffer-mint text-white' 
+                    : 'hover:bg-chauffer-mint hover:text-white'
+                }`}
+                onClick={() => setActiveFilter('today')}
+              >
                 Today
               </Button>
-              <Button variant="outline" size="sm" className="whitespace-nowrap">
+              <Button 
+                variant={activeFilter === 'high-pay' ? 'default' : 'outline'} 
+                size="sm" 
+                className={`whitespace-nowrap ${
+                  activeFilter === 'high-pay' 
+                    ? 'bg-chauffer-mint text-white' 
+                    : 'hover:bg-chauffer-mint hover:text-white'
+                }`}
+                onClick={() => setActiveFilter('high-pay')}
+              >
                 High Pay
               </Button>
-              <Button variant="outline" size="sm" className="whitespace-nowrap">
+              <Button 
+                variant={activeFilter === 'luxury' ? 'default' : 'outline'} 
+                size="sm" 
+                className={`whitespace-nowrap ${
+                  activeFilter === 'luxury' 
+                    ? 'bg-chauffer-mint text-white' 
+                    : 'hover:bg-chauffer-mint hover:text-white'
+                }`}
+                onClick={() => setActiveFilter('luxury')}
+              >
                 Luxury
               </Button>
             </div>
@@ -313,18 +377,18 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
             <div className="bg-white rounded-lg p-4 mb-4 border border-chauffer-gray-200">
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-2xl font-bold text-chauffer-black">{availableJobs.length}</p>
+                  <p className="text-2xl font-bold text-chauffer-black">{filteredJobs.length}</p>
                   <p className="text-sm text-chauffer-gray-500">Available</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-chauffer-mint">
-                    ${availableJobs.reduce((sum, job: any) => sum + (job.payout || 0), 0)}
+                    ${filteredJobs.reduce((sum, job: any) => sum + (job.payout || 0), 0)}
                   </p>
                   <p className="text-sm text-chauffer-gray-500">Total Value</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-chauffer-black">
-                    {availableJobs.filter((j: any) => (j.vehicle_type?.toLowerCase() === 'luxury')).length}
+                    {filteredJobs.filter((j: any) => (j.vehicle_type?.toLowerCase() === 'luxury')).length}
                   </p>
                   <p className="text-sm text-chauffer-gray-500">Luxury</p>
                 </div>
@@ -336,8 +400,19 @@ const Jobs = ({ onAuthRequired }: JobsProps) => {
                 <p>Loading jobs...</p>
               ) : isError ? (
                 <p className="text-red-600">Error loading jobs.</p>
+              ) : filteredJobs.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-chauffer-gray-500">No jobs found for the selected filter.</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-2"
+                    onClick={() => setActiveFilter('all')}
+                  >
+                    View All Jobs
+                  </Button>
+                </div>
               ) : (
-                availableJobs.map((job: any) => (
+                filteredJobs.map((job: any) => (
                   <div key={job.id} onClick={() => handleJobClick(job)} className="cursor-pointer">
                     <JobCard
                       {...job}
