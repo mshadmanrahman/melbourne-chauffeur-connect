@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -119,8 +118,7 @@ const Wallet = () => {
                     <span className="whitespace-nowrap">Top Up</span>
                   </Button>
                   <Button 
-                    variant="outline" 
-                    className="flex-1 min-w-0 border-white/40 bg-white/10 text-white hover:bg-white/20 hover:border-white/60"
+                    className="flex-1 min-w-0 bg-chauffer-mint hover:bg-chauffer-mint/90 text-white"
                   >
                     <ArrowUp size={16} className="mr-2" />
                     <span className="whitespace-nowrap">Withdraw</span>
