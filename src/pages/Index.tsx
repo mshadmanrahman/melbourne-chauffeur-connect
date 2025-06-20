@@ -1,12 +1,12 @@
+
 import React, { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Home from '@/pages/Home';
-import Jobs from '@/pages/Jobs';
 import PostJob from '@/pages/PostJob';
 import Wallet from '@/pages/Wallet';
 import Profile from '@/pages/Profile';
 import AuthWrapper from '@/components/auth/AuthWrapper';
-import { Home as HomeIcon, Briefcase, Plus, Wallet as WalletIcon, User } from 'lucide-react';
+import { Home as HomeIcon, Plus, Wallet as WalletIcon, User } from 'lucide-react';
 import { LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
@@ -49,8 +49,6 @@ const Index = () => {
     switch (activeTab) {
       case 'home':
         return <Home onAuthRequired={handleAuthRequired} setActiveTab={handleSetTab} />;
-      case 'jobs':
-        return <Jobs onAuthRequired={handleAuthRequired} />;
       case 'post':
         return <PostJob />;
       case 'wallet':
@@ -78,7 +76,6 @@ const Index = () => {
               <div className="space-y-2">
                 {[
                   { id: 'home', label: 'Home', icon: HomeIcon },
-                  { id: 'jobs', label: 'Jobs', icon: Briefcase },
                   { id: 'post', label: 'Post a Job', icon: Plus },
                   { id: 'wallet', label: 'Wallet', icon: WalletIcon },
                   { id: 'profile', label: 'Profile', icon: User },
