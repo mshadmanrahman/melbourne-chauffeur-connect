@@ -18,18 +18,9 @@ const ProfileProgress = ({ profile, hasStripeConnected: _ }: ProfileProgressProp
   const { stripeAccount, loading, refetch } = useStripeAccount(user?.id);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Add debugging logs
-  useEffect(() => {
-    console.log('ProfileProgress - stripeAccount:', stripeAccount);
-    console.log('ProfileProgress - loading:', loading);
-    console.log('ProfileProgress - onboarding_complete:', stripeAccount?.onboarding_complete);
-    console.log('ProfileProgress - onboarding_complete type:', typeof stripeAccount?.onboarding_complete);
-  }, [stripeAccount, loading]);
-
   // Auto-refresh when component mounts to check latest status
   useEffect(() => {
     if (user?.id) {
-      console.log('ProfileProgress - Auto-refreshing Stripe account status');
       refetch();
     }
   }, [user?.id, refetch]);
@@ -102,12 +93,12 @@ const ProfileProgress = ({ profile, hasStripeConnected: _ }: ProfileProgressProp
             variant="ghost"
             size="sm"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 h-auto"
+            className="p-1 h-auto group"
           >
             {isExpanded ? (
-              <ChevronUp size={16} className="text-chauffer-gray-500" />
+              <ChevronUp size={16} className="text-chauffer-gray-500 group-hover:text-white transition-colors" />
             ) : (
-              <ChevronDown size={16} className="text-chauffer-gray-500" />
+              <ChevronDown size={16} className="text-chauffer-gray-500 group-hover:text-white transition-colors" />
             )}
           </Button>
         </div>
