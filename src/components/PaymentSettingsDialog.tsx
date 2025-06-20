@@ -50,11 +50,31 @@ const PaymentSettingsDialog = ({ open, onOpenChange }: PaymentSettingsDialogProp
           description: "Manage your payment methods in the new tab.",
         });
       } else if (data?.error) {
-        toast({
-          title: "Error",
-          description: data.error,
-          variant: "destructive",
-        });
+        console.error('Portal error response:', data);
+        
+        if (data.setupUrl) {
+          // Show specific error for Stripe setup required
+          toast({
+            title: "Stripe Setup Required",
+            description: "Please set up your Stripe Customer Portal configuration first.",
+            variant: "destructive",
+            action: (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(data.setupUrl, '_blank')}
+              >
+                Open Stripe Dashboard
+              </Button>
+            ),
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: data.message || data.error,
+            variant: "destructive",
+          });
+        }
       } else {
         toast({
           title: "Error",
@@ -156,11 +176,21 @@ const PaymentSettingsDialog = ({ open, onOpenChange }: PaymentSettingsDialogProp
             </div>
             
             <div className="space-y-2 text-sm text-muted-foreground">
-              <p>• First time setup may require Stripe dashboard configuration</p>
-              <p>• You'll be redirected to Stripe's secure portal</p>
-              <p>• All payment data is handled by Stripe for security</p>
-              <p>• Changes made in Stripe will be reflected here automatically</p>
+              <p>• First, ensure your Stripe account is properly connected</p>
+              <p>• You may need to set up Stripe Customer Portal in your dashboard</p>
+              <p>• Visit your Stripe dashboard → Settings → Customer Portal</p>
+              <p>• All payment data is handled securely by Stripe</p>
             </div>
+            
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="mt-3"
+              onClick={() => window.open('https://dashboard.stripe.com/settings/billing/portal', '_blank')}
+            >
+              <ExternalLink className="mr-2 h-4 w-4" />
+              Open Stripe Dashboard
+            </Button>
           </Card>
 
           {/* Payment Information */}
