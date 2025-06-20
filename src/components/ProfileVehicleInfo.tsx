@@ -21,18 +21,18 @@ const ProfileVehicleInfo = ({ profile }: ProfileVehicleInfoProps) => {
   return (
     <Card className="p-6">
       <h3 className="font-semibold text-chauffer-black mb-3">Vehicle Information</h3>
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <span className="text-chauffer-gray-500">Vehicle</span>
-          <span className="text-chauffer-black">{profile.vehicle_details || 'Not specified'}</span>
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <span className="text-chauffer-gray-500 text-sm">Vehicle</span>
+          <div className="text-chauffer-black font-medium">{profile.vehicle_details || 'Not specified'}</div>
         </div>
-        <div className="flex justify-between">
-          <span className="text-chauffer-gray-500">License</span>
-          <span className="text-chauffer-black">{profile.license_number || 'Not verified'}</span>
+        <div className="space-y-1">
+          <span className="text-chauffer-gray-500 text-sm">License</span>
+          <div className="text-chauffer-black font-medium">{profile.license_number || 'Not verified'}</div>
         </div>
-        <div className="flex justify-between">
-          <span className="text-chauffer-gray-500">Insurance</span>
-          <span className="text-chauffer-black">Not verified</span>
+        <div className="space-y-1">
+          <span className="text-chauffer-gray-500 text-sm">Insurance</span>
+          <div className="text-chauffer-black font-medium">Not verified</div>
         </div>
       </div>
     </Card>
