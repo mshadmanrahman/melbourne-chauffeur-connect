@@ -154,7 +154,11 @@ const Profile = () => {
           </div>
           
           {/* Profile Settings */}
-          <ProfileSettings onEditProfile={() => setIsEditing(true)} />
+          <ProfileSettings 
+            onEditProfile={() => setIsEditing(true)}
+            profile={profile}
+            onProfileUpdate={handleProfileUpdate}
+          />
         </div>
       </div>
     </div>
