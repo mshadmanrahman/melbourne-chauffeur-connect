@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Car, License, Loader2 } from 'lucide-react';
+import { Car, FileText, Loader2 } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -87,7 +86,7 @@ const VehicleSettingsDialog = ({ open, onOpenChange, profile, onProfileUpdate }:
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="license_number" className="flex items-center gap-2">
-              <License size={16} />
+              <FileText size={16} />
               License Number
             </Label>
             <Input
