@@ -25,6 +25,18 @@ const ProfileSettings = ({ onEditProfile, profile, onProfileUpdate }: ProfileSet
   const [vehicleDialogOpen, setVehicleDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 
+  const handleVehicleSettingsClick = () => {
+    console.log('Vehicle settings button clicked');
+    setVehicleDialogOpen(true);
+  };
+
+  const handlePaymentSettingsClick = () => {
+    console.log('Payment settings button clicked');
+    setPaymentDialogOpen(true);
+  };
+
+  console.log('ProfileSettings render:', { vehicleDialogOpen, paymentDialogOpen });
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -38,14 +50,14 @@ const ProfileSettings = ({ onEditProfile, profile, onProfileUpdate }: ProfileSet
         <Button 
           variant="outline" 
           className="w-full"
-          onClick={() => setPaymentDialogOpen(true)}
+          onClick={handlePaymentSettingsClick}
         >
           Payment Settings
         </Button>
         <Button 
           variant="outline" 
           className="w-full"
-          onClick={() => setVehicleDialogOpen(true)}
+          onClick={handleVehicleSettingsClick}
         >
           Vehicle Settings
         </Button>

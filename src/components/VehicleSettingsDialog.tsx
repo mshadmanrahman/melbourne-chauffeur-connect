@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -35,10 +36,13 @@ const VehicleSettingsDialog = ({ open, onOpenChange, profile, onProfileUpdate }:
     vehicle_details: profile.vehicle_details || '',
   });
 
+  console.log('VehicleSettingsDialog render:', { open, profile });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
+    console.log('Submitting vehicle settings:', formData);
     setLoading(true);
     try {
       const { data, error } = await supabase
