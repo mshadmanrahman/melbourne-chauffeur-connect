@@ -25,18 +25,20 @@ const ProfileAccountInfo = ({ profile, user }: ProfileAccountInfoProps) => {
   return (
     <Card className="p-6">
       <h3 className="font-semibold text-chauffer-black mb-3">Account Information</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-4">
         <div className="space-y-1">
           <span className="text-chauffer-gray-500 text-sm">Email</span>
-          <div className="text-chauffer-black font-medium">{user?.email}</div>
+          <div className="text-chauffer-black font-medium break-all">{user?.email}</div>
         </div>
-        <div className="space-y-1">
-          <span className="text-chauffer-gray-500 text-sm">Phone</span>
-          <div className="text-chauffer-black font-medium">{profile.phone || 'Not specified'}</div>
-        </div>
-        <div className="space-y-1">
-          <span className="text-chauffer-gray-500 text-sm">Member Since</span>
-          <div className="text-chauffer-black font-medium">{memberSince}</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <span className="text-chauffer-gray-500 text-sm">Phone</span>
+            <div className="text-chauffer-black font-medium">{profile.phone || 'Not specified'}</div>
+          </div>
+          <div className="space-y-1">
+            <span className="text-chauffer-gray-500 text-sm">Member Since</span>
+            <div className="text-chauffer-black font-medium">{memberSince}</div>
+          </div>
         </div>
       </div>
     </Card>
