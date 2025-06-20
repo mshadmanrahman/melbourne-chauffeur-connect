@@ -47,18 +47,24 @@ serve(async (req) => {
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2023-10-16" });
     
-    // Find existing customer
+    // Find existing customer or create a new one
     const customers = await stripe.customers.list({ email: userEmail, limit: 1 });
     
+    let customerId: string;
+    
     if (customers.data.length === 0) {
-      return new Response(JSON.stringify({ error: "No Stripe customer found. Please set up payments first." }), {
-        status: 404,
-        headers: corsHeaders,
+      // Create a new customer if none exists
+      log("Creating new Stripe customer", { userEmail });
+      const newCustomer = await stripe.customers.create({
+        email: userEmail,
+        name: user.user_metadata?.full_name || `${user.user_metadata?.firstName || ''} ${user.user_metadata?.lastName || ''}`.trim() || undefined,
       });
+      customerId = newCustomer.id;
+      log("New customer created", { customerId });
+    } else {
+      customerId = customers.data[0].id;
+      log("Found existing customer", { customerId });
     }
-
-    const customerId = customers.data[0].id;
-    log("Found customer", { customerId });
 
     // Create customer portal session
     const origin = req.headers.get("origin") || "http://localhost:3000";
